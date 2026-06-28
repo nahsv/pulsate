@@ -3,7 +3,7 @@
 [![crates.io](https://img.shields.io/crates/v/pulsate.svg)](https://crates.io/crates/pulsate)
 [![docs.rs](https://img.shields.io/docsrs/pulsate)](https://docs.rs/pulsate)
 [![CI](https://github.com/nahsv/pulsate/actions/workflows/ci.yml/badge.svg)](https://github.com/nahsv/pulsate/actions/workflows/ci.yml)
-[![license](https://img.shields.io/crates/l/pulsate.svg)](https://github.com/nahsv/pulsate/blob/main/LICENSE)
+[![license](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
 
 A reverse-proxy gateway written in Rust. One static binary, one config file, one
 command — automatic TLS, caching, a WAF, observability, an admin API, and a WASM
@@ -166,4 +166,15 @@ cluster gossip transport, and the Kubernetes Gateway API controller.
 
 ## License
 
-Apache-2.0. See [docs/18-open-source.md](docs/18-open-source.md).
+Licensed under either of
+
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
+
+at your option. See [docs/18-open-source.md](docs/18-open-source.md).
+
+### Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.

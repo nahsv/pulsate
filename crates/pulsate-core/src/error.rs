@@ -112,7 +112,7 @@ impl Code {
     /// The canonical documentation URL for this code.
     #[must_use]
     pub fn docs_url(&self) -> String {
-        format!("https://docs.p8.dev/errors/{self}")
+        format!("https://pulsate.nahsv.com/errors/{self}")
     }
 }
 
@@ -310,7 +310,7 @@ mod tests {
     fn docs_url_is_well_formed() {
         assert_eq!(
             Code::PRX_NO_HEALTHY.docs_url(),
-            "https://docs.p8.dev/errors/PLS-PRX-0003"
+            "https://pulsate.nahsv.com/errors/PLS-PRX-0003"
         );
     }
 
