@@ -1,0 +1,13 @@
+[package]
+name = "pulsate-dashboard"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "The embedded dashboard: static assets served by the admin server (Svelte SPA build to follow)."
+
+[dependencies]
+
+[lints]
+workspace = true

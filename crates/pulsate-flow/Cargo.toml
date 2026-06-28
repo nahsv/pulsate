@@ -1,0 +1,15 @@
+[package]
+name = "pulsate-flow"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "The Flow configuration language: hand-written lexer, recursive-descent parser, typed AST, span-accurate diagnostics."
+
+[dependencies]
+pulsate-core = { path = "../pulsate-core", version = "0.1.0" }
+pulsate-util = { path = "../pulsate-util", version = "0.1.0" }
+
+[lints]
+workspace = true

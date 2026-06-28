@@ -1,0 +1,19 @@
+[package]
+name = "pulsate-plugin"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "WASM plugin host (Wasmtime): fuel/epoch limits, capability sandbox, ABI versioning."
+
+[dependencies]
+pulsate-core = { path = "../pulsate-core", version = "0.1.0" }
+wasmtime = { version = "36.0.7", default-features = false, features = [
+    "cranelift",
+    "runtime",
+    "wat",
+] }
+
+[lints]
+workspace = true

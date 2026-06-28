@@ -1,0 +1,16 @@
+[package]
+name = "pulsate-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Shared vocabulary: RequestCtx, Request/Response, the PulsateError taxonomy, core traits, ConfigSnapshot."
+
+[dependencies]
+bytes.workspace = true
+http.workspace = true
+thiserror.workspace = true
+
+[lints]
+workspace = true

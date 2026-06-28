@@ -1,0 +1,13 @@
+# Worked example 2 — SPA + API split with caching and CORS.
+upstream api { target http://127.0.0.1:8080; policy least_conn }
+cache assets { store memory { max 256MB }; default_ttl 1h; stale_while_revalidate 30s }
+
+site app.example.com {
+  tls auto
+  route /api/* ~> cors(origins=["https://app.example.com"], credentials=true)
+              ~> rate_limit(600/min, key=ip)
+              ~> strip_prefix("/api")
+              ~> proxy(@api)
+  route /assets/* ~> cache(@assets) ~> compress ~> files("/srv/app/assets")
+  route /*        ~> files("/srv/app", try=["{path}", "/index.html"])
+}

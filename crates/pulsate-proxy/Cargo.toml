@@ -1,0 +1,24 @@
+[package]
+name = "pulsate-proxy"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Reverse proxy: upstream pools, load balancing, retries, passive ejection / circuit breaking, forwarded headers."
+
+[dependencies]
+pulsate-core = { path = "../pulsate-core", version = "0.1.0" }
+pulsate-rt = { path = "../pulsate-rt", version = "0.1.0" }
+http.workspace = true
+bytes.workspace = true
+hyper.workspace = true
+hyper-util = { workspace = true, features = ["client", "client-legacy", "http1", "tokio"] }
+http-body-util.workspace = true
+tokio = { workspace = true, features = ["time"] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread", "net", "io-util"] }
+
+[lints]
+workspace = true

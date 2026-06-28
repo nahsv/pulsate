@@ -1,0 +1,13 @@
+# Worked example 3 — microservices gateway: gRPC, WebSocket, weighted canary.
+upstream checkout_v1 { target http://10.0.0.1:8080 weight=9 }
+upstream checkout_v2 { target http://10.0.0.2:8080 weight=1 }
+upstream chat { target http://10.0.0.5:9000 }
+upstream billing { target grpc://10.0.0.7:50051 }
+
+site gw.example.com {
+  tls auto
+  route /checkout/* ~> proxy(split=[@checkout_v1, @checkout_v2])
+  route /chat       ~> ws(@chat)
+  route /billing.*  ~> jwt(aud="internal") ~> grpc(@billing)
+  route /*          ~> respond(status=404, body="not found")
+}

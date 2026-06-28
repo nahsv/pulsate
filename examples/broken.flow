@@ -1,0 +1,5 @@
+# Intentionally invalid — demonstrates diagnostics.
+site shop.example.com {
+  route /api/* ~> compress ~> proxy(@apii)
+  route /health
+}

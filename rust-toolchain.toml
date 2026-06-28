@@ -1,0 +1,6 @@
+[toolchain]
+channel = "stable"
+components = ["rustfmt", "clippy"]
+# Linux static-binary target (the "one binary, no deps" pillar — docs/01-vision.md).
+# Harmless on other hosts; rustup only fetches it when that target is built.
+targets = ["x86_64-unknown-linux-musl"]

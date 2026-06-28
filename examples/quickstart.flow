@@ -1,0 +1,5 @@
+# Worked example 1 — the 30-second start (a Rails app, auto-HTTPS).
+site myapp.com www.myapp.com {
+  tls auto
+  route /* ~> proxy(http://localhost:3000)
+}

@@ -1,0 +1,6 @@
+upstream backend { target http://127.0.0.1:9099 }
+site localhost {
+  route /api/* ~> strip_prefix("/api")
+              ~> cors(origins=["https://app.example.com"], methods=[GET, POST], credentials=true)
+              ~> proxy(@backend)
+}

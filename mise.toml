@@ -1,0 +1,24 @@
+# mise (https://mise.jdx.dev) — pins the project toolchain so `mise install`
+# reproduces the dev environment. Rust itself is also pinned in
+# rust-toolchain.toml, which `cargo`/`rustup` honor directly; this file lets
+# mise users get the same toolchain plus the dev tasks below.
+
+[tools]
+rust = "stable"
+
+[env]
+# Keep build artifacts local and predictable.
+CARGO_TERM_COLOR = "always"
+
+[tasks.check]
+description = "Format check, clippy (deny warnings), build, test"
+run = [
+  "cargo fmt --all --check",
+  "cargo clippy --workspace --all-targets -- -D warnings",
+  "cargo build --workspace",
+  "cargo test --workspace",
+]
+
+[tasks.lint-layering]
+description = "Enforce the data-plane ⇏ control-plane dependency rule"
+run = "cargo xtask lint-layering"

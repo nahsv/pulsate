@@ -1,0 +1,4 @@
+# `cargo xtask <cmd>` runs the workspace automation crate (the cargo-xtask
+# pattern, docs/03-repository.md).
+[alias]
+xtask = "run --package xtask --"

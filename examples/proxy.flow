@@ -1,0 +1,7 @@
+# Reverse proxy to a backend pool + a dead pool to show failure handling.
+upstream backend { target http://127.0.0.1:9099 }
+upstream dead    { target http://127.0.0.1:9 ; retry { attempts 2 } }
+site localhost {
+  route /dead/* ~> proxy(@dead)
+  route /*      ~> proxy(@backend)
+}

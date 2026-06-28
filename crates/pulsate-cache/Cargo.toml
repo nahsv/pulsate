@@ -1,0 +1,16 @@
+[package]
+name = "pulsate-cache"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "HTTP caching: in-memory store, RFC-9111 freshness, validators, stale-while-revalidate, tag-based purge."
+
+[dependencies]
+pulsate-core = { path = "../pulsate-core", version = "0.1.0" }
+http.workspace = true
+bytes.workspace = true
+
+[lints]
+workspace = true

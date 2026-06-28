@@ -1,0 +1,16 @@
+[package]
+name = "pulsate-migrate"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Config importers: nginx / Caddy → Flow, with a fidelity report."
+
+[dependencies]
+
+[dev-dependencies]
+pulsate-flow = { path = "../pulsate-flow", version = "0.1.0" }
+
+[lints]
+workspace = true

@@ -1,0 +1,14 @@
+[package]
+name = "pulsate-util"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Buffer pools, duration/size parsing, and small shared helpers."
+
+[dependencies]
+bytes.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,21 @@
+[package]
+name = "p8"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "The Pulsate gateway: process entry; wires the control and data planes; owns the supervisor."
+
+# A shared `run()` lives in src/lib.rs; the binaries `p8` (src/main.rs) and
+# `pulsate` (src/bin/pulsate.rs) are thin wrappers, discovered automatically.
+
+[dependencies]
+pulsate-core = { path = "../pulsate-core", version = "0.1.0" }
+pulsate-rt = { path = "../pulsate-rt", version = "0.1.0" }
+pulsate-cli = { path = "../pulsate-cli", version = "0.1.0" }
+clap.workspace = true
+anyhow.workspace = true
+
+[lints]
+workspace = true

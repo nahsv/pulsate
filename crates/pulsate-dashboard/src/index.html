@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pulsate — Dashboard</title>
+<style>
+  :root { color-scheme: light dark; --fg:#e6e6e6; --bg:#0e1116; --card:#161b22; --acc:#3fb950; --mut:#8b949e; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:var(--bg); color:var(--fg); }
+  header { padding:16px 24px; border-bottom:1px solid #21262d; display:flex; align-items:center; gap:12px; }
+  header h1 { font-size:16px; margin:0; letter-spacing:.5px; }
+  header .pulsate { color:var(--acc); }
+  main { padding:24px; display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); max-width:1100px; }
+  .card { background:var(--card); border:1px solid #21262d; border-radius:8px; padding:16px; }
+  .card h2 { font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--mut); margin:0 0 12px; }
+  .kv { display:flex; justify-content:space-between; padding:3px 0; }
+  .kv span:last-child { color:var(--acc); }
+  pre { margin:0; max-height:260px; overflow:auto; font-size:12px; color:var(--mut); }
+  input { background:#0d1117; border:1px solid #30363d; color:var(--fg); padding:6px 8px; border-radius:6px; font:inherit; }
+  button { background:var(--acc); border:0; color:#08130b; padding:6px 12px; border-radius:6px; font:inherit; cursor:pointer; }
+  .err { color:#f85149; }
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="p8">●</span> Pulsate</h1>
+  <input id="token" placeholder="admin token" size="30">
+  <button onclick="save()">connect</button>
+  <span id="status" class="err"></span>
+</header>
+<main>
+  <div class="card"><h2>Overview</h2><div id="info">—</div></div>
+  <div class="card"><h2>Upstreams</h2><div id="upstreams">—</div></div>
+  <div class="card"><h2>Audit log</h2><pre id="audit">—</pre></div>
+  <div class="card"><h2>Metrics</h2><pre id="metrics">—</pre></div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let token = localStorage.getItem("pulsate_token") || "";
+$("token").value = token;
+function save(){ token = $("token").value.trim(); localStorage.setItem("pulsate_token", token); refresh(); }
+
+async function api(path, json=true){
+  const r = await fetch(path, { headers: token ? { authorization: "Bearer " + token } : {} });
+  if(!r.ok) throw new Error(path + " → " + r.status);
+  return json ? r.json() : r.text();
+}
+function kv(obj){ return Object.entries(obj).map(([k,v]) => `<div class="kv"><span>${k}</span><span>${v}</span></div>`).join(""); }
+
+async function refresh(){
+  $("status").textContent = "";
+  try {
+    $("info").innerHTML = kv(await api("/v1/info"));
+    const ups = await api("/v1/upstreams");
+    $("upstreams").innerHTML = ups.upstreams.length
+      ? ups.upstreams.map(u => `<div class="kv"><span>@${u.name}</span><span>${u.targets} target(s)</span></div>`).join("")
+      : "<div class='kv'><span>none</span><span></span></div>";
+    const audit = await api("/v1/audit");
+    $("audit").textContent = audit.entries.length
+      ? audit.entries.map(e => `#${e.seq} ${e.event}`).join("\n")
+      : "(empty)";
+    $("metrics").textContent = await api("/v1/metrics", false);
+  } catch(e) {
+    $("status").textContent = e.message;
+  }
+}
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>

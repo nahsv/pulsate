@@ -1,0 +1,16 @@
+[package]
+name = "pulsate-pipeline"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Middleware engine (Ingress/Egress) and built-in middleware: strip_prefix, headers, cors."
+
+[dependencies]
+pulsate-core = { path = "../pulsate-core", version = "0.1.0" }
+pulsate-waf = { path = "../pulsate-waf", version = "0.1.0" }
+http.workspace = true
+
+[lints]
+workspace = true

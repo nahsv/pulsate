@@ -1,0 +1,29 @@
+[package]
+name = "pulsate-http"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "HTTP/1.1 serving over hyper: normalize to Request/Response and execute terminal handlers."
+
+[dependencies]
+pulsate-core = { path = "../pulsate-core", version = "0.1.0" }
+pulsate-rt = { path = "../pulsate-rt", version = "0.1.0" }
+pulsate-router = { path = "../pulsate-router", version = "0.1.0" }
+pulsate-proxy = { path = "../pulsate-proxy", version = "0.1.0" }
+pulsate-pipeline = { path = "../pulsate-pipeline", version = "0.1.0" }
+pulsate-observe = { path = "../pulsate-observe", version = "0.1.0" }
+pulsate-cache = { path = "../pulsate-cache", version = "0.1.0" }
+hyper.workspace = true
+hyper-util.workspace = true
+http-body-util.workspace = true
+http.workspace = true
+bytes.workspace = true
+tokio = { workspace = true, features = ["fs", "io-util"] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread", "net", "io-util"] }
+
+[lints]
+workspace = true

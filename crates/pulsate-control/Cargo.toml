@@ -1,0 +1,27 @@
+[package]
+name = "pulsate-control"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Control-plane orchestrator and REST admin API (token auth + RBAC, loopback by default)."
+
+[dependencies]
+pulsate-core = { path = "../pulsate-core", version = "0.1.0" }
+pulsate-config = { path = "../pulsate-config", version = "0.1.0" }
+pulsate-http = { path = "../pulsate-http", version = "0.1.0" }
+pulsate-waf = { path = "../pulsate-waf", version = "0.1.0" }
+pulsate-dashboard = { path = "../pulsate-dashboard", version = "0.1.0" }
+hyper.workspace = true
+hyper-util.workspace = true
+http-body-util.workspace = true
+http.workspace = true
+bytes.workspace = true
+tokio = { workspace = true, features = ["net", "rt", "sync", "macros"] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread", "net", "io-util"] }
+
+[lints]
+workspace = true

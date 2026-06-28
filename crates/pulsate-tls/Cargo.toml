@@ -1,0 +1,20 @@
+[package]
+name = "pulsate-tls"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "rustls server configuration: SNI certificate resolution, ALPN, manual certs (mTLS to follow)."
+
+[dependencies]
+pulsate-core = { path = "../pulsate-core", version = "0.1.0" }
+rustls.workspace = true
+tokio-rustls.workspace = true
+rustls-pemfile.workspace = true
+
+[dev-dependencies]
+rcgen = "0.13"
+
+[lints]
+workspace = true

@@ -1,0 +1,19 @@
+[package]
+name = "pulsate-acme"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "ACME plumbing: HTTP-01 challenge store, dynamic (live-updatable) certificate store, on-demand allow-list."
+
+[dependencies]
+pulsate-core = { path = "../pulsate-core", version = "0.1.0" }
+pulsate-tls = { path = "../pulsate-tls", version = "0.1.0" }
+rustls.workspace = true
+
+[dev-dependencies]
+rcgen = "0.13"
+
+[lints]
+workspace = true

@@ -1,0 +1,14 @@
+[package]
+name = "pulsate-cluster"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Clustering: membership, leader/peer roles, shared state."
+
+[dependencies]
+pulsate-core = { path = "../pulsate-core", version = "0.1.0" }
+
+[lints]
+workspace = true

@@ -1,0 +1,95 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/p8",
+    "crates/pulsate-core",
+    "crates/pulsate-rt",
+    "crates/pulsate-util",
+    "crates/pulsate-flow",
+    "crates/pulsate-config",
+    "crates/pulsate-net",
+    "crates/pulsate-tls",
+    "crates/pulsate-http",
+    "crates/pulsate-http3",
+    "crates/pulsate-router",
+    "crates/pulsate-pipeline",
+    "crates/pulsate-proxy",
+    "crates/pulsate-cache",
+    "crates/pulsate-waf",
+    "crates/pulsate-control",
+    "crates/pulsate-acme",
+    "crates/pulsate-cluster",
+    "crates/pulsate-secrets",
+    "crates/pulsate-observe",
+    "crates/pulsate-plugin",
+    "crates/pulsate-sdk",
+    "crates/pulsate-dashboard",
+    "crates/pulsate-cli",
+    "crates/pulsate-migrate",
+    "crates/pulsate-test",
+    "xtask",
+]
+
+# Single source of truth for shared package metadata. Member crates inherit via
+# `version.workspace = true` etc. so versions never drift (docs/03-repository.md).
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.86"
+license = "Apache-2.0"
+repository = "https://github.com/pulsate-gateway/p8"
+
+# Shared dependency versions, declared once and inherited with `dep.workspace = true`.
+[workspace.dependencies]
+# Internal crates (path deps) are declared in each member directly.
+# External, third-party deps used across the workspace are pinned here.
+tokio = { version = "1", default-features = false }
+bytes = "1"
+http = "1"
+thiserror = "2"
+tracing = "0.1"
+anyhow = "1"
+arc-swap = "1"
+clap = { version = "4", features = ["derive"] }
+hyper = { version = "1", default-features = false, features = ["server", "http1", "http2"] }
+hyper-util = { version = "0.1", default-features = false, features = [
+    "tokio",
+    "server",
+    "server-auto",
+    "client",
+    "client-legacy",
+    "http1",
+    "http2",
+] }
+http-body-util = "0.1"
+tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "tls12"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+rustls-pemfile = "2"
+socket2 = { version = "0.5", features = ["all"] }
+
+# Workspace-wide lint policy (docs/03-repository.md: coding standards). Members opt
+# in with `[lints] workspace = true`. Kept as `warn` so scaffold builds stay green;
+# CI escalates fmt/clippy/deny to gates.
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+# Curated allow-list: noise that fights the house style more than it helps.
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+# Doc prose mentions units/numbers (10MB, 10_000_000) and product names freely;
+# requiring backticks on every one fights readability more than it helps.
+doc_markdown = "allow"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+
+# Thin, fast release profile knobs. Allocator + LTO tuning lands with the perf
+# milestone (docs/10-performance.md); kept conservative here.
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = true

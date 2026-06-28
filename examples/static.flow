@@ -1,0 +1,6 @@
+# Static site + health endpoint + redirect, served by `p8 up`.
+site localhost {
+  route = /healthz ~> respond(status=204)
+  route = /old     ~> redirect(to="/", status=308)
+  route /*         ~> files("examples/webroot")
+}

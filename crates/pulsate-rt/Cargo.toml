@@ -1,0 +1,21 @@
+[package]
+name = "pulsate-rt"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Async runtime abstraction (Tokio backend); the seam for a future thread-per-core io_uring runtime."
+
+[dependencies]
+tokio = { workspace = true, features = [
+    "rt",
+    "rt-multi-thread",
+    "net",
+    "time",
+    "macros",
+    "sync",
+] }
+
+[lints]
+workspace = true

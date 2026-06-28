@@ -1,0 +1,42 @@
+# cargo-deny policy: license allow-list, advisory denial, dependency bans.
+
+[advisories]
+version = 2
+yanked = "deny"
+ignore = [
+    # rustls-pemfile is unmaintained; its PEM parsing now lives in
+    # rustls-pki-types. Used only at startup to load certificates.
+    "RUSTSEC-2025-0134",
+]
+
+[licenses]
+version = 2
+allow = [
+    "Apache-2.0",
+    # Cranelift and wasmtime carry the LLVM exception on top of Apache-2.0.
+    "Apache-2.0 WITH LLVM-exception",
+    "MIT",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Unicode-3.0",
+    "Zlib",
+]
+confidence-threshold = 0.9
+
+[bans]
+multiple-versions = "warn"
+# All external dependencies are version-pinned in [workspace.dependencies]; the
+# only unversioned ("wildcard") requirements are the first-party `pulsate-*` path
+# deps, so the wildcard check is allowed rather than fighting it per-crate.
+wildcards = "allow"
+# rustls only: no OpenSSL anywhere in the tree.
+deny = [
+    { name = "openssl" },
+    { name = "openssl-sys" },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

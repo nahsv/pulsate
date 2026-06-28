@@ -1,0 +1,38 @@
+# Pulsate on Kubernetes — minimal Deployment + Service.
+# Gateway API / native CRD controller + EndpointSlice discovery: see docs/16-deployment.md
+# (the controller is the next increment; this runs Pulsate with a mounted config).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: p8
+  labels: { app: p8 }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: p8 } }
+  template:
+    metadata: { labels: { app: p8 } }
+    spec:
+      containers:
+        - name: p8
+          image: ghcr.io/pulsate-gateway/p8:latest
+          args: ["up", "/etc/p8/pulsate.flow", "--listen", "0.0.0.0:8080", "--metrics", "0.0.0.0:9100"]
+          ports:
+            - { name: http, containerPort: 8080 }
+            - { name: metrics, containerPort: 9100 }
+          readinessProbe: { httpGet: { path: /healthz, port: http } }
+          volumeMounts: [{ name: config, mountPath: /etc/p8 }]
+          resources:
+            requests: { cpu: "100m", memory: "64Mi" }
+            limits: { cpu: "1", memory: "256Mi" }
+      volumes:
+        - name: config
+          configMap: { name: pulsate-config }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: p8
+spec:
+  selector: { app: p8 }
+  ports:
+    - { name: http, port: 80, targetPort: http }

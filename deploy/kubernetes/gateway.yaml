@@ -1,0 +1,20 @@
+# Gateway API sample (conformance target — docs/16-deployment.md).
+# Pulsate's controller reconciles these into a ConfigSnapshot; shown here as the
+# intended resource shape.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata: { name: p8 }
+spec:
+  gatewayClassName: p8
+  listeners:
+    - { name: http, protocol: HTTP, port: 80 }
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata: { name: app }
+spec:
+  parentRefs: [{ name: p8 }]
+  hostnames: ["app.example.com"]
+  rules:
+    - matches: [{ path: { type: PathPrefix, value: /api } }]
+      backendRefs: [{ name: api, port: 8080 }]
