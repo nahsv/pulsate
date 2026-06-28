@@ -55,6 +55,9 @@ Prebuilt binaries, `.deb`/`.rpm` packages, and the container image are produced
 for every tagged release by [`.github/workflows/release.yml`](.github/workflows/release.yml).
 The Debian package installs a systemd unit; enable it with `sudo systemctl enable --now pulsate`.
 
+Releases — version bumps, changelogs, and crates.io publishing across all crates —
+are automated with [release-plz](https://release-plz.dev); see [RELEASING.md](RELEASING.md).
+
 ## Quick start
 
 ```sh

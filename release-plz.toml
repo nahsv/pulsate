@@ -1,0 +1,25 @@
+# release-plz drives crates.io releases for the whole workspace.
+# https://release-plz.dev
+#
+# Flow: commits land on `main` → release-plz opens a "release PR" that bumps
+# versions and updates changelogs → merging it publishes every changed crate to
+# crates.io. Only the `pulsate` binary crate gets a git tag + GitHub release
+# (`v{version}`), which triggers .github/workflows/release.yml to build the
+# binaries, .deb/.rpm packages, and the container image. Library crates publish
+# without their own tags, so the tag list stays clean.
+
+[workspace]
+# Publish every crate to crates.io, but tag/release only the binary (see below).
+publish = true
+git_tag_enable = false
+git_release_enable = false
+changelog_update = true
+dependencies_update = false
+# Run `cargo publish` in dependency order with retries (the point of using this).
+publish_timeout = "30m"
+
+[[package]]
+name = "pulsate"
+git_tag_enable = true
+git_tag_name = "v{{ version }}"
+git_release_enable = true
