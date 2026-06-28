@@ -1,5 +1,10 @@
 # Pulsate
 
+[![crates.io](https://img.shields.io/crates/v/pulsate.svg)](https://crates.io/crates/pulsate)
+[![docs.rs](https://img.shields.io/docsrs/pulsate)](https://docs.rs/pulsate)
+[![CI](https://github.com/nahsv/pulsate/actions/workflows/ci.yml/badge.svg)](https://github.com/nahsv/pulsate/actions/workflows/ci.yml)
+[![license](https://img.shields.io/crates/l/pulsate.svg)](https://github.com/nahsv/pulsate/blob/main/LICENSE)
+
 A reverse-proxy gateway written in Rust. One static binary, one config file, one
 command — automatic TLS, caching, a WAF, observability, an admin API, and a WASM
 plugin host, without bolting on a second tool.
@@ -15,8 +20,29 @@ scales, unchanged in shape, to a multi-site deployment.
 
 ## Install
 
+Every channel installs two identical binaries: **`pulsate`** and its short alias
+**`p8`**.
+
 ```sh
-cargo install pulsate   # installs two identical binaries: `pulsate` and the short alias `p8`
+# Shell installer (Linux/macOS) — downloads the prebuilt release binary
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/nahsv/pulsate/main/scripts/install.sh | sh
+
+# Cargo (any platform with Rust)
+cargo install pulsate
+cargo binstall pulsate           # prebuilt binary, no compile
+
+# Homebrew (macOS/Linux)
+brew install nahsv/tap/pulsate
+
+# Debian / Ubuntu
+curl -fsSLO https://github.com/nahsv/pulsate/releases/latest/download/pulsate_amd64.deb
+sudo apt install ./pulsate_amd64.deb
+
+# Fedora / RHEL
+sudo dnf install https://github.com/nahsv/pulsate/releases/latest/download/pulsate.x86_64.rpm
+
+# Docker
+docker run --rm -p 8080:8080 ghcr.io/nahsv/pulsate:latest
 ```
 
 Or build from source (Rust 1.86+):
@@ -24,6 +50,10 @@ Or build from source (Rust 1.86+):
 ```sh
 cargo build --release
 ```
+
+Prebuilt binaries, `.deb`/`.rpm` packages, and the container image are produced
+for every tagged release by [`.github/workflows/release.yml`](.github/workflows/release.yml).
+The Debian package installs a systemd unit; enable it with `sudo systemctl enable --now pulsate`.
 
 ## Quick start
 

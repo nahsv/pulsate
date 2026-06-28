@@ -1,0 +1,6 @@
+# Default Pulsate configuration, installed at /etc/pulsate/pulsate.flow.
+# Replace this with your real sites. See https://github.com/pulsate-gateway/pulsate.
+
+site :default {
+  route /* ~> respond(status=200, body="Pulsate is running. Edit /etc/pulsate/pulsate.flow")
+}

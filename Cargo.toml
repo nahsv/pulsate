@@ -37,7 +37,7 @@ version = "0.1.0"
 edition = "2021"
 rust-version = "1.86"
 license = "Apache-2.0"
-repository = "https://github.com/pulsate-gateway/p8"
+repository = "https://github.com/nahsv/pulsate"
 
 # Shared dependency versions, declared once and inherited with `dep.workspace = true`.
 [workspace.dependencies]

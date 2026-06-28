@@ -5,7 +5,16 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "The Pulsate gateway: process entry; wires the control and data planes; owns the supervisor."
+description = "Pulsate — a reverse-proxy gateway in one binary: TLS, caching, WAF, observability, admin API, and WASM plugins."
+readme = "README.md"
+homepage = "https://github.com/nahsv/pulsate"
+documentation = "https://docs.rs/pulsate"
+keywords = ["gateway", "reverse-proxy", "http", "proxy", "tls"]
+categories = [
+    "network-programming",
+    "web-programming::http-server",
+    "command-line-utilities",
+]
 
 # A shared `run()` lives in src/lib.rs. The primary binary `pulsate`
 # (src/main.rs) and its short alias `p8` (src/bin/p8.rs) are thin wrappers,
@@ -20,3 +29,42 @@ anyhow.workspace = true
 
 [lints]
 workspace = true
+
+# --- Debian / Ubuntu package (cargo-deb) ---------------------------------------
+[package.metadata.deb]
+maintainer = "NAHSV Healthlinko <webmaster@nahsv.com>"
+copyright = "2026, NAHSV Healthlinko Private Limited"
+section = "net"
+priority = "optional"
+extended-description = """\
+Pulsate is a reverse-proxy gateway: automatic TLS, caching, a WAF, rate \
+limiting, observability, a loopback admin API and dashboard, and a sandboxed \
+WASM plugin host — in a single static binary configured by one file.\
+"""
+assets = [
+    ["target/release/pulsate", "usr/bin/", "755"],
+    ["target/release/p8", "usr/bin/", "755"],
+    ["packaging/pulsate.flow", "etc/pulsate/pulsate.flow", "644"],
+    ["packaging/systemd/pulsate.service", "lib/systemd/system/pulsate.service", "644"],
+    ["README.md", "usr/share/doc/pulsate/README.md", "644"],
+]
+conf-files = ["/etc/pulsate/pulsate.flow"]
+
+# --- RPM package (cargo-generate-rpm) ------------------------------------------
+[package.metadata.generate-rpm]
+assets = [
+    { source = "target/release/pulsate", dest = "/usr/bin/pulsate", mode = "755" },
+    { source = "target/release/p8", dest = "/usr/bin/p8", mode = "755" },
+    { source = "packaging/pulsate.flow", dest = "/etc/pulsate/pulsate.flow", mode = "644", config = true },
+    { source = "packaging/systemd/pulsate.service", dest = "/lib/systemd/system/pulsate.service", mode = "644" },
+    { source = "README.md", dest = "/usr/share/doc/pulsate/README.md", mode = "644", doc = true },
+]
+
+# --- cargo-binstall: fetch prebuilt release binaries instead of compiling ------
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/pulsate-v{ version }-{ target }.{ archive-suffix }"
+pkg-fmt = "tgz"
+bin-dir = "{ bin }{ binary-ext }"
+
+[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
+pkg-fmt = "zip"
