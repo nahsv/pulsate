@@ -16,10 +16,6 @@ infrastructure-grade tools that need a control plane and a team to run. Pulsate 
 an attempt to refuse that trade-off: the same config that starts a single box
 scales, unchanged in shape, to a multi-site deployment.
 
-> Status: under active development. The data plane, configuration language,
-> reverse proxy, caching, WAF, observability, admin API, and plugin host are
-> implemented and tested. See [Status](#status) for what isn't wired up yet.
-
 ## Install
 
 Every channel installs the **`pulsate`** binary.
@@ -252,18 +248,6 @@ configuration language, the reverse-proxy and middleware models, security, the
 admin API, the error catalog, and more. Kubernetes manifests live in
 [`deploy/kubernetes/`](deploy/kubernetes/) and runnable configs in
 [`examples/`](examples/).
-
-## Status
-
-Implemented and tested: the HTTP/1.1 + HTTP/2 data plane, the Flow language and
-snapshot/reload machinery, the reverse proxy, the middleware pipeline, caching,
-the WAF and rate limiting, observability, the admin API and dashboard, the WASM
-plugin host, and the nginx/Caddy/HAProxy/Apache importers.
-
-Not yet wired up: live ACME certificate issuance (the challenge and certificate
-stores exist; the protocol client does not), the QUIC/HTTP-3 transport (only
-`Alt-Svc` discovery is emitted), the gRPC admin surface and event streams, the
-cluster gossip transport, and the Kubernetes Gateway API controller.
 
 ## License
 
