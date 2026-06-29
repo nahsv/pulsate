@@ -1,6 +1,6 @@
 # 30. Migration and Import
 
-> The on-ramp from incumbents: `p8 import` tooling that converts nginx, Caddy, and Traefik configurations into Pulsate Flow — with directive mapping tables, fidelity warnings, dry-run diffs, and round-trip validation. Lowering switching cost is a growth strategy.
+> The on-ramp from incumbents: `p8 import` tooling that converts nginx, Caddy, HAProxy, and Apache configurations into Pulsate Flow — with directive mapping tables, fidelity warnings, dry-run diffs, and round-trip validation. Lowering switching cost is a growth strategy.
 
 **Contents**
 - [Why importers matter](#why-importers-matter)
@@ -8,7 +8,8 @@
 - [Fidelity model & warnings](#fidelity-model--warnings)
 - [nginx → Flow](#nginx--flow)
 - [Caddy → Flow](#caddy--flow)
-- [Traefik → Flow](#traefik--flow)
+- [HAProxy → Flow](#haproxy--flow)
+- [Apache → Flow](#apache--flow)
 - [Validation & rollout workflow](#validation--rollout-workflow)
 - [Limitations](#limitations)
 - [Cross-references](#cross-references)
@@ -32,7 +33,8 @@ foreign config ─▶ [foreign parser] ─▶ foreign AST ─▶ [mapper] ─▶
 p8 import nginx /etc/nginx/nginx.conf -o pulsate.flow     # write
 p8 import nginx /etc/nginx/nginx.conf --diff            # preview mapping, write nothing
 p8 import caddy ./Caddyfile
-p8 import traefik ./traefik/                            # static + dynamic dir
+p8 import haproxy /etc/haproxy/haproxy.cfg              # frontends/backends → sites + upstreams
+p8 import apache /etc/apache2/sites-enabled/site.conf  # <VirtualHost> → site
 ```
 
 Every import emits a **migration report**: what mapped cleanly, what needed approximation, and what couldn't be represented (with line references back to the source).
@@ -87,22 +89,44 @@ Caddy is the closest in spirit (auto-TLS by default), so mappings are mostly Exa
 
 Caddy's JSON config is also importable (the underlying model), and Caddy plugins map to Pulsate plugins/built-ins where equivalents exist (else Manual).
 
-## Traefik → Flow
+## HAProxy → Flow
 
-Traefik spreads config across static + dynamic (file/labels/CRD); the importer ingests all and unifies:
+HAProxy splits routing across `frontend`/`backend`/`listen` sections; the importer
+turns server pools into upstreams and binds + routing rules into sites:
 
-| Traefik | Flow |
+| HAProxy | Flow |
 |---|---|
-| `entryPoints.web/websecure` | `pulsate { http{} https{} }` |
-| router `rule: Host(\`x\`) && PathPrefix(\`/api\`)` | `site x { route /api/* ~> ... }` |
-| `service.loadBalancer.servers` | `upstream { target ... }` |
-| middlewares (`stripPrefix`,`headers`,`rateLimit`,`compress`) | `strip_prefix`/`headers`/`rate_limit`/`compress` |
-| `tls.certResolver` (ACME) | `acme { ... }` |
-| `tls.options` | `tls { min_version; ciphers }` |
-| labels (`traefik.http.routers...`) | the same routes (Pulsate can also read labels natively — [14. DX](14-developer-experience.md)) |
-| sticky cookie | `upstream { sticky { cookie } }` |
+| `backend b { server s 10.0.0.1:8080 }` | `upstream b { target http://10.0.0.1:8080 }` |
+| `frontend f` / `listen f` | `site ... { ... }` |
+| `bind *:443 ssl crt ...` | `tls auto` |
+| `acl is_api path_beg /api` + `use_backend api if is_api` | `route /api/* ~> proxy(@api)` |
+| `acl exact path /h` + `use_backend ...` | `route = /h ~> proxy(@...)` |
+| `default_backend web` | `route /* ~> proxy(@web)` |
+| `acl host hdr(host) example.com` | site host `example.com` |
+| `redirect location <url> code 301` | `redirect(to="<url>", status=301)` |
 
-Traefik middleware chains map directly onto the `~>` pipeline — often a clean, readable improvement. Provider-specific dynamic config (Consul/etcd KV) maps to Pulsate discovery where equivalent.
+A `listen` section that carries its own `server` lines becomes both an upstream and
+a site proxying to it. Non-path ACLs (header/source matches), stick tables, and
+TCP-mode rules are flagged Manual.
+
+## Apache → Flow
+
+The importer reads `<VirtualHost>` blocks and maps their reverse-proxy, static, and
+redirect directives:
+
+| Apache | Flow |
+|---|---|
+| `<VirtualHost *:443>` + `SSLEngine on` | `site ... { tls auto }` |
+| `ServerName x` / `ServerAlias y z` | `site x y z` |
+| `ProxyPass /api http://b:8080/` | `route /api/* ~> proxy(http://b:8080)` |
+| `ProxyPass / http://b:3000/` | `route /* ~> proxy(http://b:3000)` |
+| `DocumentRoot /srv/www` | `route /* ~> files("/srv/www")` (when nothing else claims `/`) |
+| `Redirect 301 /old <url>` | `route /old ~> redirect(to="<url>", status=301)` |
+
+More specific `ProxyPass` paths are emitted before the catch-all so they match first.
+`ProxyPassReverse` is implied by `proxy()` and dropped; `ProxyPassMatch`,
+`RedirectMatch`, `RewriteRule`, and `<Directory>`/`<Location>` containers are flagged
+Manual.
 
 ## Validation & rollout workflow
 
@@ -117,7 +141,7 @@ A safe, reviewable migration path:
 ## Limitations
 
 Honest boundaries (also stated in the report):
-- **Embedded code** (nginx Lua, Caddy/Traefik custom Go plugins) cannot be auto-translated — flagged Manual with a suggestion to port to a WASM plugin ([12. Plugins](12-plugins.md)).
+- **Embedded code** (nginx Lua, Caddy/Apache modules, HAProxy Lua) cannot be auto-translated — flagged Manual with a suggestion to port to a WASM plugin ([12. Plugins](12-plugins.md)).
 - **Imperative `if`/rewrite spaghetti** may need human simplification; the importer prefers correctness-with-a-warning over a clever-but-wrong translation.
 - **Exotic/rare directives** are emitted as TODO stubs rather than guessed.
 - The importer **never silently drops** behavior — anything not represented is reported. The goal is a trustworthy 80–95% automatic conversion plus a clear list of the remainder.

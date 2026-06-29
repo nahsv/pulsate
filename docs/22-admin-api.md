@@ -51,7 +51,7 @@
 All errors use **RFC 9457 `application/problem+json`** with a stable Pulsate error code ([25. Error Catalog](25-error-and-status-catalog.md)):
 
 ```json
-{ "type": "https://pulsate.nahsv.com/errors/PLS-CFG-0007",
+{ "type": "https://squaretick.dev/pulsate/errors/PLS-CFG-0007",
   "title": "Unknown upstream reference",
   "status": 422,
   "code": "PLS-CFG-0007",

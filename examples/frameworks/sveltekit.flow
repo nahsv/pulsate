@@ -1,0 +1,36 @@
+# SvelteKit / Vite SPA behind Pulsate
+# =================================================================
+# Two patterns in one file — pick the one matching your adapter.
+#
+# A) Static build (adapter-static / Vite `build`): no Node at runtime,
+#    Pulsate serves files directly with an SPA fallback.
+# B) Node SSR (adapter-node): proxy to the Node server.
+#
+# STEPS (A — static)
+#   1. npm run build            # outputs to ./build
+#   2. p8 validate examples/frameworks/sveltekit.flow
+#      sudo p8 up examples/frameworks/sveltekit.flow
+#   3. Verify deep-link refresh works (SPA fallback to index.html).
+#
+# STEPS (B — SSR): build, then `PORT=3000 node build/index.js`, and use
+# the commented `proxy(@node)` site instead.
+# =================================================================
+
+# ---- A) Static SPA -------------------------------------------------
+site app.example.com {
+  tls auto
+
+  # Hashed assets under /_app are immutable (cache-busted by build).
+  route /_app/* ~> compress ~> files("build")
+
+  # SPA fallback: serve the requested file, else index.html (client routing).
+  route /* ~> compress ~> files("build", try=["{path}", "/index.html"])
+}
+
+# ---- B) Node SSR (uncomment, and comment out site A above) ----------
+# upstream node { target http://127.0.0.1:3000; policy least_conn }
+# site app.example.com {
+#   tls auto
+#   route /_app/* ~> compress ~> proxy(@node)
+#   route /*      ~> compress ~> proxy(@node)
+# }

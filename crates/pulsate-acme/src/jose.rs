@@ -164,8 +164,7 @@ impl AccountKey {
             payload: payload_b64,
             signature: signature_b64,
         };
-        serde_json::to_string(&jws)
-            .map_err(|e| crypto_err(format!("cannot serialize JWS: {e}")))
+        serde_json::to_string(&jws).map_err(|e| crypto_err(format!("cannot serialize JWS: {e}")))
     }
 }
 
@@ -267,7 +266,12 @@ mod tests {
         let key = AccountKey::generate();
         let payload = serde_json::json!({"termsOfServiceAgreed": true});
         let body = key
-            .sign_request("https://ca/acme/new-acct", "nonce-1", KeyId::Jwk, Some(&payload))
+            .sign_request(
+                "https://ca/acme/new-acct",
+                "nonce-1",
+                KeyId::Jwk,
+                Some(&payload),
+            )
             .unwrap();
 
         // Reconstruct the signing input and verify the signature with the public
@@ -294,7 +298,12 @@ mod tests {
     fn post_as_get_has_empty_payload() {
         let key = AccountKey::generate();
         let body = key
-            .sign_request("https://ca/acme/order/1", "nonce-2", KeyId::Kid("https://ca/acct/1"), None)
+            .sign_request(
+                "https://ca/acme/order/1",
+                "nonce-2",
+                KeyId::Kid("https://ca/acct/1"),
+                None,
+            )
             .unwrap();
         let v: serde_json::Value = serde_json::from_str(&body).unwrap();
         // Empty string payload, and the header carries kid (not jwk).

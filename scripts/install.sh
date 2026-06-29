@@ -1,12 +1,12 @@
 #!/bin/sh
 # Install Pulsate (the `pulsate` binary and its `p8` alias) from GitHub releases.
 #
-#   curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/nahsv/pulsate/main/scripts/install.sh | sh
+#   curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/squaretick/pulsate/main/scripts/install.sh | sh
 #
 # Env overrides: PULSATE_VERSION (e.g. v0.1.0), PULSATE_BIN_DIR (default /usr/local/bin).
 set -eu
 
-REPO="nahsv/pulsate"
+REPO="squaretick/pulsate"
 BIN_DIR="${PULSATE_BIN_DIR:-/usr/local/bin}"
 
 err() { echo "install: $*" >&2; exit 1; }

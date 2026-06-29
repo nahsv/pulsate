@@ -8,7 +8,7 @@ assignees: ""
 
 <!--
 SECURITY: Do NOT report security vulnerabilities here. Follow SECURITY.md
-(private disclosure to security@nahsv.com or a GitHub private advisory).
+(private disclosure to security@squaretick.dev or a GitHub private advisory).
 -->
 
 ## Description

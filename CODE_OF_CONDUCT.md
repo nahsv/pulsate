@@ -60,8 +60,8 @@ representative at an online or offline event.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement at
-[conduct@nahsv.com](mailto:conduct@nahsv.com) (or
-[webmaster@nahsv.com](mailto:webmaster@nahsv.com)).
+[conduct@squaretick.dev](mailto:conduct@squaretick.dev) (or
+[webmaster@squaretick.dev](mailto:webmaster@squaretick.dev)).
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the

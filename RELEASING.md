@@ -36,7 +36,7 @@ GitHub repo secrets:
   the release PR can trigger CI. Without it the PR still opens, but CI won't run
   on the PR itself.
 
-The Homebrew tap (`nahsv/homebrew-tap`) holds `Formula/pulsate.rb`; bump its
+The Homebrew tap (`squaretick/homebrew-tap`) holds `Formula/pulsate.rb`; bump its
 `version` + four `sha256` after each release (`brew bump-formula-pr` automates it
 from the release's `*.sha256` assets).
 

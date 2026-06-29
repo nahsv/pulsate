@@ -6,13 +6,20 @@
 //! round-trip), and a grow-only [`GCounter`] CRDT that lets nodes merge
 //! distributed rate-limit / cache counts without locks or a central authority.
 //!
-//! The gossip transport is not implemented.
+//! The [`gossip`] module adds the live SWIM transport that drives these types
+//! over UDP, exposed as [`Cluster`] / [`Config`].
 #![forbid(unsafe_code)]
 
 use std::collections::{BTreeSet, HashMap};
 
+use serde::{Deserialize, Serialize};
+
+pub mod gossip;
+
+pub use gossip::{Cluster, Config};
+
 /// A stable node identifier within the cluster.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct NodeId(String);
 
 impl NodeId {
@@ -99,7 +106,7 @@ impl Membership {
 /// A grow-only counter CRDT: each node owns a slot it increments; the merged
 /// value is the sum of the per-node maxima. Merges are commutative, associative,
 /// and idempotent, so nodes can exchange state in any order and converge.
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GCounter {
     counts: HashMap<NodeId, u64>,
 }

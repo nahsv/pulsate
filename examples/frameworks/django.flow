@@ -1,0 +1,47 @@
+# Django (Gunicorn/Uvicorn) behind Pulsate
+# =================================================================
+# End-to-end: Django with auto HTTPS, static + media file serving,
+# gzip, and a locked-down /admin — replacing nginx+Gunicorn.
+#
+# STEPS
+#   1. Collect static files, run the app server on loopback:
+#        python manage.py collectstatic --noinput
+#        gunicorn myproject.wsgi:application -b 127.0.0.1:8000 --workers 3
+#      (ASGI/Channels? use uvicorn myproject.asgi:application and add the
+#       /ws route below.)
+#   2. In settings.py: SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+#      and ALLOWED_HOSTS = ["example.com"].
+#   3. p8 validate examples/frameworks/django.flow
+#      sudo p8 up examples/frameworks/django.flow
+#   4. Verify:  curl -I https://example.com/static/...  → cached, gzipped
+# =================================================================
+
+upstream gunicorn {
+  target http://127.0.0.1:8000
+  policy least_conn
+  retry { attempts 2 }
+}
+
+cache static {
+  store memory { max 256MB }
+  default_ttl 30d
+  stale_while_revalidate 60s
+}
+
+site example.com {
+  tls auto
+
+  # STATIC_ROOT and MEDIA_ROOT served straight from disk.
+  route /static/* ~> cache(@static) ~> compress ~> files("staticfiles")
+  route /media/*  ~> compress ~> files("media")
+
+  # Throttle and restrict the admin to known office IPs (optional).
+  route /admin/* ~> require(ip=["203.0.113.0/24", "127.0.0.1"])
+                 ~> rate_limit(60/min, key=ip)
+                 ~> proxy(@gunicorn)
+
+  # Channels/WebSocket endpoint (uncomment if using ASGI).
+  # route /ws/* ~> ws(@gunicorn)
+
+  route /* ~> compress ~> proxy(@gunicorn)
+}

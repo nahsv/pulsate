@@ -118,7 +118,8 @@
 |---|---|
 | `p8 import nginx <nginx.conf> [-o pulsate.flow]` | Convert an nginx config to Flow (mapping + fidelity warnings). |
 | `p8 import caddy <Caddyfile>` | Convert a Caddyfile. |
-| `p8 import traefik <file/dir>` | Convert Traefik static + dynamic config. |
+| `p8 import haproxy <haproxy.cfg>` | Convert an HAProxy config (frontends/backends → sites + upstreams). |
+| `p8 import apache <httpd.conf>` | Convert an Apache vhost config (`ProxyPass`/`Redirect`/`DocumentRoot`). |
 | `p8 import --diff` | Show source→Flow mapping and any unsupported directives, without writing. |
 
 Migration semantics and fidelity are detailed in [30. Migration & Import](30-migration-and-import.md).

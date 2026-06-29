@@ -1,0 +1,38 @@
+# Express / Node.js API behind Pulsate
+# =================================================================
+# End-to-end: a Node API with auto HTTPS, CORS, rate limiting, and a
+# WebSocket upgrade — replacing nginx as the Node reverse proxy.
+#
+# STEPS
+#   1. Run the Node app on loopback (cluster it across cores if you like):
+#        PORT=3000 node server.js     # or: pm2 start server.js -i max
+#      Trust the proxy in Express:  app.set("trust proxy", 1)
+#   2. Point DNS for api.example.com at this host.
+#   3. p8 validate examples/frameworks/express.flow
+#      sudo p8 up examples/frameworks/express.flow
+#   4. Verify:  curl https://api.example.com/health
+# =================================================================
+
+# Multiple Node workers? List them and let Pulsate load-balance.
+upstream node {
+  target http://127.0.0.1:3000
+  target http://127.0.0.1:3001
+  policy round_robin
+  retry { attempts 2 }
+}
+
+site api.example.com {
+  tls auto
+
+  # Health check served by Pulsate itself — no round trip to Node.
+  route = /health ~> respond(status=200, body="ok")
+
+  # Socket.IO / ws upgrade.
+  route /socket.io/* ~> ws(@node)
+
+  # JSON API: browser CORS + per-IP rate limit.
+  route /* ~> cors(origins=["https://app.example.com"], methods=[GET, POST, PUT, DELETE], credentials=true)
+           ~> rate_limit(1200/min, key=ip)
+           ~> compress
+           ~> proxy(@node)
+}

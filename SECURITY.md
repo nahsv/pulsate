@@ -10,8 +10,8 @@ requests, or discussions.**
 
 Instead, report privately through either of:
 
-- **Email:** [security@nahsv.com](mailto:security@nahsv.com) or [webmaster@nahsv.com](mailto:webmaster@nahsv.com) (PGP key available on request)
-- **GitHub:** open a [private security advisory](https://github.com/nahsv/pulsate/security/advisories/new)
+- **Email:** [security@squaretick.dev](mailto:security@squaretick.dev) or [webmaster@squaretick.dev](mailto:webmaster@squaretick.dev) (PGP key available on request)
+- **GitHub:** open a [private security advisory](https://github.com/squaretick/pulsate/security/advisories/new)
 
 Please include as much of the following as you can:
 

@@ -9,6 +9,19 @@ description = "Clustering: membership, leader/peer roles, shared state."
 
 [dependencies]
 pulsate-core = { path = "../pulsate-core", version = "0.1.0" }
+tokio = { version = "1", features = ["net", "time", "rt", "sync", "macros"] }
+serde = { version = "1", features = ["derive"] }
+postcard = { version = "1", default-features = false, features = ["use-std"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = [
+    "rt-multi-thread",
+    "net",
+    "time",
+    "rt",
+    "sync",
+    "macros",
+] }
 
 [lints]
 workspace = true

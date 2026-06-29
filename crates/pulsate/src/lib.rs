@@ -57,9 +57,9 @@ enum Command {
         #[command(subcommand)]
         action: PluginAction,
     },
-    /// Import an nginx/Caddy config into Flow.
+    /// Import an nginx/Caddy/HAProxy/Apache config into Flow.
     Import {
-        /// Source format: nginx or caddy.
+        /// Source format: nginx, caddy, haproxy, or apache.
         format: String,
         /// Path to the foreign config file.
         file: PathBuf,
@@ -241,7 +241,7 @@ fn print_info() {
     println!();
     println!("  {bin} up <config>          serve a gateway");
     println!("  {bin} validate <config>    check a config without starting");
-    println!("  {bin} import nginx <file>  translate an nginx config to Flow");
+    println!("  {bin} import <fmt> <file>  translate nginx/caddy/haproxy/apache to Flow");
     println!("  {bin} plugin run <file>    run a WASM plugin");
 }
 

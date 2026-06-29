@@ -36,7 +36,7 @@ Pulsate adopts the **Diátaxis** framework — four distinct doc types serving f
 | **Explanation** | understand concepts | "why does it work this way?" |
 
 ```
-pulsate.nahsv.com/
+squaretick.dev/pulsate/
 ├── start/            tutorials (learning-oriented)
 ├── guides/           how-tos (task-oriented)
 ├── reference/        config / CLI / API / metrics / errors (information-oriented)

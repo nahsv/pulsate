@@ -1,0 +1,44 @@
+# Laravel (Octane / PHP-FPM) behind Pulsate
+# =================================================================
+# End-to-end: Laravel with auto HTTPS, /storage + build asset serving,
+# and gzip — replacing nginx+PHP-FPM.
+#
+# STEPS (Octane — recommended, a real HTTP server):
+#   1. composer require laravel/octane && php artisan octane:install
+#      php artisan octane:start --server=frankenphp --host=127.0.0.1 --port=8000
+#   2. Build front-end assets:  npm run build  (Vite -> public/build)
+#   3. In AppServiceProvider boot(): if(app()->environment('production')) URL::forceScheme('https');
+#      Set TrustProxies to trust the loopback.
+#   4. p8 validate examples/frameworks/laravel.flow
+#      sudo p8 up examples/frameworks/laravel.flow
+#   5. Verify:  curl -I https://example.com  → 200, http/2, HSTS
+# =================================================================
+
+upstream octane {
+  target http://127.0.0.1:8000
+  policy least_conn
+  retry { attempts 2 }
+}
+
+cache assets {
+  store memory { max 256MB }
+  default_ttl 1y
+  stale_while_revalidate 60s
+}
+
+site example.com {
+  tls auto
+
+  # Vite-built, hashed assets — cache hard.
+  route /build/* ~> cache(@assets)
+                 ~> compress
+                 ~> files("public")
+
+  # Public storage symlink (php artisan storage:link).
+  route /storage/* ~> compress ~> files("public")
+
+  # Laravel Reverb / WebSockets (uncomment if used).
+  # route /app/* ~> ws(@octane)
+
+  route /* ~> compress ~> proxy(@octane)
+}

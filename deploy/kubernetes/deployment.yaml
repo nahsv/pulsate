@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: p8
-          image: ghcr.io/nahsv/pulsate:latest
+          image: ghcr.io/squaretick/pulsate:latest
           args: ["up", "/etc/p8/pulsate.flow", "--listen", "0.0.0.0:8080", "--metrics", "0.0.0.0:9100"]
           ports:
             - { name: http, containerPort: 8080 }

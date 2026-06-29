@@ -22,7 +22,7 @@ Per-crate changelogs are generated from [Conventional Commits][cc] by
 
 ### Changed
 - License finalized as **Apache-2.0** (patent grant + cloud-native ecosystem fit).
-- Project domain moved to `pulsate.nahsv.com`.
+- Project domain moved to `squaretick.dev/pulsate`.
 
 ## [0.1.0]
 
@@ -31,5 +31,5 @@ Per-crate changelogs are generated from [Conventional Commits][cc] by
   HTTP stack, reverse proxy, router, config/flow language, WAF, cache, pipeline,
   TLS, observability, plugins, dashboard, CLI, and admin control plane.
 
-[Unreleased]: https://github.com/nahsv/pulsate/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/nahsv/pulsate/releases/tag/v0.1.0
+[Unreleased]: https://github.com/squaretick/pulsate/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/squaretick/pulsate/releases/tag/v0.1.0

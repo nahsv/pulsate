@@ -18,10 +18,18 @@ hyper-util.workspace = true
 http-body-util.workspace = true
 http.workspace = true
 bytes.workspace = true
-tokio = { workspace = true, features = ["net", "rt", "sync", "macros"] }
+tokio = { workspace = true, features = ["net", "rt", "sync", "macros", "time"] }
+tonic = "0.12"
+prost = "0.13"
+tokio-stream = { version = "0.1", features = ["net", "sync"] }
+
+[build-dependencies]
+tonic-build = "0.12"
 
 [dev-dependencies]
-tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread", "net", "io-util"] }
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread", "net", "io-util", "time"] }
+pulsate-proxy = { path = "../pulsate-proxy", version = "0.1.0" }
+pulsate-router = { path = "../pulsate-router", version = "0.1.0" }
 
 [lints]
 workspace = true

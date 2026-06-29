@@ -1,4 +1,4 @@
-//! `pulsate-migrate` — import nginx / Caddy configs into Flow.
+//! `pulsate-migrate` — import nginx / Caddy / HAProxy / Apache configs into Flow.
 //!
 //! The `p8 import` engine (`docs/30-migration-and-import.md`): parse a foreign
 //! config, translate the constructs it understands into Flow, and report the
@@ -7,7 +7,9 @@
 //! starting point — not a silent, lossy rewrite.
 #![forbid(unsafe_code)]
 
+mod apache;
 mod caddy;
+mod haproxy;
 mod nginx;
 
 /// How faithfully a source directive was translated.
@@ -96,18 +98,27 @@ pub enum Source {
     Nginx,
     /// A `Caddyfile`.
     Caddy,
+    /// A `haproxy.cfg`.
+    HAProxy,
+    /// An Apache httpd / virtual-host config.
+    Apache,
 }
 
 impl Source {
-    /// Parse a format name (`nginx`, `caddy`).
+    /// Parse a format name (`nginx`, `caddy`, `haproxy`, `apache`).
     #[must_use]
     pub fn parse(name: &str) -> Option<Self> {
         match name.to_ascii_lowercase().as_str() {
             "nginx" => Some(Source::Nginx),
             "caddy" => Some(Source::Caddy),
+            "haproxy" => Some(Source::HAProxy),
+            "apache" | "httpd" => Some(Source::Apache),
             _ => None,
         }
     }
+
+    /// The comma-separated list of accepted format names, for help text.
+    pub const NAMES: &'static str = "nginx, caddy, haproxy, apache";
 }
 
 /// Import a foreign config into Flow.
@@ -116,6 +127,8 @@ pub fn import(source: Source, text: &str) -> Import {
     match source {
         Source::Nginx => nginx::import(text),
         Source::Caddy => caddy::import(text),
+        Source::HAProxy => haproxy::import(text),
+        Source::Apache => apache::import(text),
     }
 }
 
@@ -170,7 +183,10 @@ mod tests {
     fn source_parses_known_formats() {
         assert_eq!(Source::parse("nginx"), Some(Source::Nginx));
         assert_eq!(Source::parse("CADDY"), Some(Source::Caddy));
-        assert_eq!(Source::parse("apache"), None);
+        assert_eq!(Source::parse("haproxy"), Some(Source::HAProxy));
+        assert_eq!(Source::parse("apache"), Some(Source::Apache));
+        assert_eq!(Source::parse("httpd"), Some(Source::Apache));
+        assert_eq!(Source::parse("traefik"), None);
     }
 
     // The generated Flow must at least be syntactically valid Flow.
@@ -196,6 +212,50 @@ mod tests {
         assert!(imported.flow.contains("site example.com www.example.com"));
         assert!(imported.flow.contains("proxy(@backend)"));
         assert!(imported.flow.contains("upstream backend"));
+        assert!(imported.count(Fidelity::Exact) > 0);
+        assert_parses(&imported.flow);
+    }
+
+    #[test]
+    fn haproxy_round_trips_to_valid_flow() {
+        let conf = "
+frontend fe
+    bind *:443 ssl crt /etc/cert.pem
+    acl is_api path_beg /api
+    use_backend api if is_api
+    default_backend web
+backend api
+    server a 10.0.0.9:9000 check
+backend web
+    server w1 10.0.0.1:8080 check
+    server w2 10.0.0.2:8080 check
+";
+        let imported = import(Source::HAProxy, conf);
+        assert!(imported.flow.contains("upstream web"));
+        assert!(imported.flow.contains("route /api/* ~> proxy(@api)"));
+        assert!(imported.count(Fidelity::Exact) > 0);
+        assert_parses(&imported.flow);
+    }
+
+    #[test]
+    fn apache_round_trips_to_valid_flow() {
+        let conf = r"
+<VirtualHost *:443>
+    ServerName example.com
+    ServerAlias www.example.com
+    SSLEngine on
+    ProxyPass /api http://localhost:8080/
+    ProxyPass / http://localhost:3000/
+</VirtualHost>
+<VirtualHost *:80>
+    ServerName files.example.com
+    DocumentRoot /srv/www
+    Redirect 301 /old https://example.com/new
+</VirtualHost>
+";
+        let imported = import(Source::Apache, conf);
+        assert!(imported.flow.contains("site example.com www.example.com"));
+        assert!(imported.flow.contains("proxy(http://localhost:8080)"));
         assert!(imported.count(Fidelity::Exact) > 0);
         assert_parses(&imported.flow);
     }

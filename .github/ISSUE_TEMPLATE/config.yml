@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security vulnerability
-    url: https://github.com/nahsv/pulsate/security/advisories/new
+    url: https://github.com/squaretick/pulsate/security/advisories/new
     about: Report security issues privately — never via a public issue. See SECURITY.md.
   - name: Questions & discussion
-    url: https://github.com/nahsv/pulsate/discussions
+    url: https://github.com/squaretick/pulsate/discussions
     about: Ask questions, share ideas, and get help here.

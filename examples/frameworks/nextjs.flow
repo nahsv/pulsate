@@ -1,0 +1,42 @@
+# Next.js behind Pulsate
+# =================================================================
+# End-to-end: SSR/ISR Next.js with auto HTTPS, immutable hashed-asset
+# caching for /_next/static, and gzip — replacing nginx or Vercel-style
+# edge for a self-host.
+#
+# STEPS
+#   1. Build + start the Next server on loopback:
+#        npm run build
+#        PORT=3000 HOSTNAME=127.0.0.1 npm run start
+#      (For `next export` static output, see sveltekit.flow's files() pattern.)
+#   2. Point DNS for app.example.com at this host.
+#   3. p8 validate examples/frameworks/nextjs.flow
+#      sudo p8 up examples/frameworks/nextjs.flow
+#   4. Verify:  curl -I https://app.example.com/_next/static/... → immutable cache
+# =================================================================
+
+upstream next {
+  target http://127.0.0.1:3000
+  policy least_conn
+}
+
+cache static {
+  store memory { max 512MB }
+  default_ttl 1y
+  stale_while_revalidate 60s
+}
+
+site app.example.com {
+  tls auto
+
+  # Content-hashed build assets are safe to cache forever.
+  route /_next/static/* ~> cache(@static)
+                        ~> compress
+                        ~> proxy(@next)
+
+  # Public files served from /public (favicon, images, robots.txt).
+  route /static/* ~> compress ~> files("public")
+
+  # SSR / API routes / ISR — proxy to the Next server.
+  route /* ~> compress ~> proxy(@next)
+}

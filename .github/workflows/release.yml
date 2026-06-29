@@ -71,7 +71,7 @@ jobs:
       - uses: docker/metadata-action@v5
         id: meta
         with:
-          images: ghcr.io/nahsv/pulsate
+          images: ghcr.io/squaretick/pulsate
           tags: |
             type=semver,pattern={{version}}
             type=raw,value=latest

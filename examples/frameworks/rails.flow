@@ -1,0 +1,49 @@
+# Ruby on Rails behind Pulsate
+# =================================================================
+# End-to-end: serve a Rails app with automatic HTTPS, gzip, static
+# asset caching, and ActionCable WebSockets — replacing nginx+Puma
+# or Thruster.
+#
+# STEPS
+#   1. Run your app server (Puma) on a loopback port:
+#        bin/rails server -b 127.0.0.1 -p 3000 -e production
+#      (Precompile assets first: RAILS_ENV=production bin/rails assets:precompile)
+#   2. Point DNS for myapp.com / www.myapp.com at this host.
+#   3. Validate + serve this file:
+#        p8 validate examples/frameworks/rails.flow
+#        sudo p8 up examples/frameworks/rails.flow
+#      Pulsate fetches a Let's Encrypt cert automatically (port 80+443).
+#   4. Verify:  curl -I https://myapp.com   →  200 + HSTS, http/2
+# =================================================================
+
+upstream puma {
+  target http://127.0.0.1:3000
+  policy least_conn
+  retry { attempts 2 }
+}
+
+# Long-lived cache for digest-fingerprinted assets under /assets and /packs.
+cache assets {
+  store memory { max 256MB }
+  default_ttl 1y
+  stale_while_revalidate 60s
+}
+
+site myapp.com www.myapp.com {
+  tls auto
+
+  # Canonicalize www -> apex (optional; drop if you prefer www).
+  route www.myapp.com/* ~> redirect(to="https://myapp.com{path}", status=308)
+
+  # Serve precompiled, fingerprinted assets straight from disk — never hit Puma.
+  route /assets/* ~> cache(@assets)
+                  ~> compress
+                  ~> files("public")
+  route /packs/*  ~> cache(@assets) ~> compress ~> files("public")
+
+  # ActionCable WebSocket endpoint.
+  route /cable ~> ws(@puma)
+
+  # Everything else -> Puma.
+  route /* ~> compress ~> proxy(@puma)
+}

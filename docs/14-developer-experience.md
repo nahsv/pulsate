@@ -26,7 +26,7 @@ One step, many channels, no dependencies (one static binary):
 
 ```bash
 # Universal installer (detects OS/arch, verifies signature)
-curl -fsSL https://pulsate.nahsv.com/install.sh | sh
+curl -fsSL https://squaretick.dev/pulsate/install.sh | sh
 
 # Package managers
 brew install p8                      # macOS / Linuxbrew

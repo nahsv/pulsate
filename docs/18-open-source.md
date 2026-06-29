@@ -77,7 +77,7 @@ Labels and a triage rotation keep the tracker healthy; stale-bot is used gently 
 ## Security policy
 
 A published `SECURITY.md`:
-- **Private disclosure:** report vulnerabilities to `security@nahsv.com` (or `webmaster@nahsv.com`, and/or a GitHub private advisory), **never** a public issue. PGP key provided.
+- **Private disclosure:** report vulnerabilities to `security@squaretick.dev` (or `webmaster@squaretick.dev`, and/or a GitHub private advisory), **never** a public issue. PGP key provided.
 - **Response SLA:** acknowledge within 48 hours; triage and severity (CVSS) assessment; coordinated-disclosure timeline (target ≤90 days, faster for actively-exploited).
 - **Fix & release:** patch developed privately, released across supported versions as an out-of-band security release ([03. Repository](03-repository.md)), with a CVE and an advisory.
 - **Supported versions:** a documented support window (current + previous minor; LTS lines in the enterprise edition).

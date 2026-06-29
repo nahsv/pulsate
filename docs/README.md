@@ -81,7 +81,7 @@ The plan is **34 documents**: 20 core documents (`01`–`20`) covering vision th
 | 27 | [Configuration Reference](27-config-reference.md) | Exhaustive key-by-key reference for the Flow format. |
 | 28 | [Testing & Conformance](28-testing-and-conformance.md) | Unit/property/fuzz/conformance/load/soak/chaos and release gates. |
 | 29 | [Multi-Tenancy & Isolation](29-multi-tenancy-and-isolation.md) | Tenant model, namespacing, quotas, RBAC, blast-radius containment. |
-| 30 | [Migration & Import](30-migration-and-import.md) | `p8 import` from nginx/Caddy/Traefik with fidelity reporting. |
+| 30 | [Migration & Import](30-migration-and-import.md) | `p8 import` from nginx/Caddy/HAProxy/Apache with fidelity reporting. |
 | 31 | [Benchmarking & Tuning](31-benchmarking-and-tuning.md) | Reproducible benchmark matrix and the operator tuning guide. |
 | 32 | [Disaster Recovery & HA](32-disaster-recovery-and-ha.md) | Redundancy, backup/restore, RPO/RTO, split-brain, runbooks. |
 | 33 | [Release Engineering & Supply Chain](33-release-engineering-and-supply-chain.md) | Reproducible builds, SBOM, signing/SLSA, channels, update verification. |
@@ -146,7 +146,7 @@ The plan is **34 documents**: 20 core documents (`01`–`20`) covering vision th
 
 **29 Multi-Tenancy & Isolation** — The tenant model, host/cache/limit namespacing, per-tenant quotas and noisy-neighbor protection, RBAC-scoped control plane, isolated telemetry/audit, per-tenant plugin sandboxing, and blast-radius containment.
 
-**30 Migration & Import** — `p8 import` for nginx/Caddy/Traefik with directive mapping tables, a fidelity model (exact/approximate/manual/dropped), a safe shadow-then-cutover workflow, and honest limitations.
+**30 Migration & Import** — `p8 import` for nginx/Caddy/HAProxy/Apache with directive mapping tables, a fidelity model (exact/approximate/manual/dropped), a safe shadow-then-cutover workflow, and honest limitations.
 
 **31 Benchmarking & Tuning** — Reference environments, the workload matrix, correct-latency tooling, fair apples-to-apples comparison methodology, no-cherry-pick reporting, and a practical OS/config/topology tuning guide.
 

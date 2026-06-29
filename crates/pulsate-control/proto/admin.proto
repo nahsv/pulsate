@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+// The gRPC admin surface. Mirrors the JSON REST API one-for-one and adds a
+// server-streaming event feed. RBAC and bearer-token auth are enforced by a
+// tonic interceptor and per-RPC scope checks; errors carry the same `PLS-ADM-*`
+// codes as the REST surface in a `pls-error-code` status-metadata entry.
+package pulsate.admin.v1;
+
+// Admin operations, each mirroring a REST endpoint, plus an event stream.
+service Admin {
+  // GET /v1/info — runtime identity and generation counters. (read)
+  rpc GetInfo(GetInfoRequest) returns (Info);
+  // GET /v1/metrics — Prometheus exposition text. (read)
+  rpc GetMetrics(GetMetricsRequest) returns (Metrics);
+  // GET /v1/upstreams — named upstream pools and their target counts. (read)
+  rpc ListUpstreams(ListUpstreamsRequest) returns (UpstreamList);
+  // POST /v1/config/validate — compile config without publishing. (write)
+  rpc ValidateConfig(ConfigText) returns (ValidateResult);
+  // POST /v1/config/reload — validate and atomically publish config. (write)
+  rpc ReloadConfig(ConfigText) returns (ReloadResult);
+  // GET /v1/audit — the tamper-evident audit chain. (admin)
+  rpc GetAuditLog(GetAuditLogRequest) returns (AuditLog);
+  // Server-streaming feed of control-plane events. (admin)
+  rpc WatchEvents(WatchEventsRequest) returns (stream Event);
+}
+
+message GetInfoRequest {}
+message GetMetricsRequest {}
+message ListUpstreamsRequest {}
+message GetAuditLogRequest {}
+message WatchEventsRequest {}
+
+// Runtime identity and live counters.
+message Info {
+  string version = 1;
+  uint64 generation = 2;
+  uint64 sites = 3;
+  uint64 upstreams = 4;
+}
+
+// Prometheus exposition text.
+message Metrics {
+  string prometheus = 1;
+}
+
+// One named upstream pool.
+message Upstream {
+  string name = 1;
+  uint64 targets = 2;
+}
+
+// The set of named upstream pools.
+message UpstreamList {
+  repeated Upstream upstreams = 1;
+}
+
+// Raw configuration text to validate or reload.
+message ConfigText {
+  string text = 1;
+}
+
+// A single diagnostic against submitted config.
+message Problem {
+  string code = 1;
+  uint32 line = 2;
+  uint32 col = 3;
+  string message = 4;
+}
+
+// Result of compiling config without publishing.
+message ValidateResult {
+  bool valid = 1;
+  repeated Problem problems = 2;
+}
+
+// Result of an attempted config reload.
+message ReloadResult {
+  bool ok = 1;
+  uint64 generation = 2;
+  repeated Problem problems = 3;
+}
+
+// One entry of the hash-chained audit log.
+message AuditEntry {
+  uint64 seq = 1;
+  string event = 2;
+  string hash = 3;
+}
+
+// The audit log with its end-to-end verification status.
+message AuditLog {
+  bool verified = 1;
+  repeated AuditEntry entries = 2;
+}
+
+// A control-plane event, one of several variants.
+message Event {
+  oneof kind {
+    ConfigReloaded config_reloaded = 1;
+    LifecycleChanged lifecycle_changed = 2;
+    AuditAppended audit_appended = 3;
+  }
+}
+
+// Config was reloaded to a new generation.
+message ConfigReloaded {
+  uint64 generation = 1;
+}
+
+// The process lifecycle state changed.
+message LifecycleChanged {
+  string state = 1;
+}
+
+// A new entry was appended to the audit log.
+message AuditAppended {
+  uint64 seq = 1;
+  string event = 2;
+  string hash = 3;
+}

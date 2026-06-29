@@ -11,7 +11,10 @@
 //! layer ([`AccountKey`]) is implemented (see the `jose` module).
 #![forbid(unsafe_code)]
 
+pub mod ca;
+mod client;
 mod jose;
+mod transport;
 
 use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, Mutex};
@@ -19,7 +22,11 @@ use std::sync::{Arc, Mutex};
 use rustls::server::{ClientHello, ResolvesServerCert};
 use rustls::sign::CertifiedKey;
 
+pub use client::{
+    AcmeClient, AcmeTransport, Directory, Http01Challenge, HttpResponse, Method, Order,
+};
 pub use jose::{AccountKey, Jwk, KeyId};
+pub use transport::HttpsTransport;
 
 /// The well-known path prefix for HTTP-01 challenge responses.
 pub const HTTP01_PREFIX: &str = "/.well-known/acme-challenge/";

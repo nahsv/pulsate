@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Config importers: nginx / Caddy → Flow, with a fidelity report."
+description = "Config importers: nginx / Caddy / HAProxy / Apache → Flow, with a fidelity report."
 
 [dependencies]
 

@@ -26,6 +26,7 @@ members = [
     "crates/pulsate-dashboard",
     "crates/pulsate-cli",
     "crates/pulsate-migrate",
+    "crates/pulsate-k8s",
     "crates/pulsate-test",
     "xtask",
 ]
@@ -37,7 +38,7 @@ version = "0.1.0"
 edition = "2021"
 rust-version = "1.86"
 license = "Apache-2.0"
-repository = "https://github.com/nahsv/pulsate"
+repository = "https://github.com/squaretick/pulsate"
 
 # Shared dependency versions, declared once and inherited with `dep.workspace = true`.
 [workspace.dependencies]

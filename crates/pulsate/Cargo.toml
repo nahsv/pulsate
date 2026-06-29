@@ -7,7 +7,7 @@ license.workspace = true
 repository.workspace = true
 description = "Pulsate — a reverse-proxy gateway in one binary: TLS, caching, WAF, observability, admin API, and WASM plugins."
 readme = "README.md"
-homepage = "https://github.com/nahsv/pulsate"
+homepage = "https://github.com/squaretick/pulsate"
 documentation = "https://docs.rs/pulsate"
 keywords = ["gateway", "reverse-proxy", "http", "proxy", "tls"]
 categories = [
@@ -32,7 +32,7 @@ workspace = true
 
 # --- Debian / Ubuntu package (cargo-deb) ---------------------------------------
 [package.metadata.deb]
-maintainer = "NAHSV Healthlinko <webmaster@nahsv.com>"
+maintainer = "NAHSV Healthlinko <webmaster@squaretick.dev>"
 copyright = "2026, NAHSV Healthlinko Private Limited"
 section = "net"
 priority = "optional"

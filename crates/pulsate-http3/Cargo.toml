@@ -9,7 +9,32 @@ description = "HTTP/3 over QUIC."
 
 [dependencies]
 pulsate-core = { path = "../pulsate-core", version = "0.1.0" }
-pulsate-rt = { path = "../pulsate-rt", version = "0.1.0" }
+pulsate-tls = { path = "../pulsate-tls", version = "0.1.0" }
+pulsate-http = { path = "../pulsate-http", version = "0.1.0" }
+pulsate-router = { path = "../pulsate-router", version = "0.1.0" }
+pulsate-pipeline = { path = "../pulsate-pipeline", version = "0.1.0" }
+pulsate-proxy = { path = "../pulsate-proxy", version = "0.1.0" }
+pulsate-cache = { path = "../pulsate-cache", version = "0.1.0" }
+pulsate-observe = { path = "../pulsate-observe", version = "0.1.0" }
+
+http.workspace = true
+bytes.workspace = true
+rustls.workspace = true
+tokio = { workspace = true, features = ["rt", "net", "macros", "time", "sync"] }
+
+# QUIC transport + HTTP/3 framing. Pinned as a mutually compatible set:
+# h3-quinn 0.0.10 bridges h3 0.0.8 onto quinn 0.11 (quinn-proto 0.11.15), which
+# uses rustls 0.23 — matching the workspace rustls pin.
+quinn = { version = "0.11", default-features = false, features = [
+    "runtime-tokio",
+    "rustls-ring",
+] }
+h3 = "0.0.8"
+h3-quinn = "0.0.10"
+
+[dev-dependencies]
+rcgen = "0.13"
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }
 
 [lints]
 workspace = true

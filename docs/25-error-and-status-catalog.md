@@ -32,7 +32,7 @@ PLS-<AREA>-<NNNN>
 
 Areas: `CFG` (config), `HTTP` (protocol/decode), `PRX` (proxy/upstream), `TLS`, `ACME`, `SEC` (security/auth), `WAF`, `CACHE`, `PLG` (plugin), `ADM` (admin API), `CLU` (cluster), `SYS` (process/runtime).
 
-Each code has: a title, a category, a severity, an HTTP status (if request-facing), an operator remediation, and a docs URL (`https://pulsate.nahsv.com/errors/PLS-...`).
+Each code has: a title, a category, a severity, an HTTP status (if request-facing), an operator remediation, and a docs URL (`https://squaretick.dev/pulsate/errors/PLS-...`).
 
 ## Categories
 
@@ -50,7 +50,7 @@ Each code has: a title, a category, a severity, an HTTP status (if request-facin
 All request-facing and API errors use RFC 9457:
 
 ```json
-{ "type": "https://pulsate.nahsv.com/errors/PLS-PRX-0003",
+{ "type": "https://squaretick.dev/pulsate/errors/PLS-PRX-0003",
   "title": "Upstream connection failed",
   "status": 502,
   "code": "PLS-PRX-0003",

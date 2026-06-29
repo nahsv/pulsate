@@ -7,6 +7,12 @@ ignore = [
     # rustls-pemfile is unmaintained; its PEM parsing now lives in
     # rustls-pki-types. Used only at startup to load certificates.
     "RUSTSEC-2025-0134",
+    # The next three are unmaintained transitive deps pulled in only by
+    # pulsate-k8s through the kube controller runtime — none on a request
+    # path; all clear once kube cuts a release off these crates.
+    "RUSTSEC-2025-0012", # backoff (via kube-runtime) — retry backoff helper
+    "RUSTSEC-2024-0388", # derivative (via kube-runtime) — derive macros
+    "RUSTSEC-2024-0384", # instant (via backoff → kube-runtime) — wasm clock
 ]
 
 [licenses]
@@ -21,8 +27,20 @@ allow = [
     "ISC",
     "Unicode-3.0",
     "Zlib",
+    # webpki-roots ships Mozilla's CA bundle (data, not code) under the
+    # Community Data License Agreement. Pulled in transitively by kube's
+    # rustls TLS stack.
+    "CDLA-Permissive-2.0",
 ]
 confidence-threshold = 0.9
+
+# jsonpath-rust (via kube-client) sets `license-file` instead of a SPDX
+# `license` field; it is Apache-2.0/MIT. Map the file to the expression so the
+# license check resolves it instead of warning on a missing field.
+[[licenses.clarify]]
+crate = "jsonpath-rust"
+expression = "Apache-2.0 OR MIT"
+license-files = [{ path = "LICENSE", hash = 0 }]
 
 [bans]
 multiple-versions = "warn"

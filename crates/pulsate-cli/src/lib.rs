@@ -107,13 +107,16 @@ pub fn validate_text(name: &str, text: &str) -> Outcome {
     }
 }
 
-/// `p8 import <nginx|caddy> <path>` — translate a foreign config to Flow.
+/// `p8 import <nginx|caddy|haproxy|apache> <path>` — translate a foreign config to Flow.
 #[must_use]
 pub fn import_config(format: &str, path: &Path) -> Outcome {
     let Some(source) = pulsate_migrate::Source::parse(format) else {
         return Outcome::fail(
             exit::RUNTIME,
-            format!("pulsate: unknown import format {format:?} (use nginx or caddy)\n"),
+            format!(
+                "pulsate: unknown import format {format:?} (use {})\n",
+                pulsate_migrate::Source::NAMES
+            ),
         );
     };
     let text = match std::fs::read_to_string(path) {

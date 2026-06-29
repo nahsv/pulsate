@@ -1,0 +1,32 @@
+# Go (net/http) service behind Pulsate
+# =================================================================
+# End-to-end: a Go HTTP service with auto HTTPS, gzip, and an
+# embedded-asset SPA fallback — Pulsate handles TLS so your Go binary
+# stays plain HTTP on loopback.
+#
+# STEPS
+#   1. Run your binary on loopback:
+#        PORT=8080 ./myservice            # http.ListenAndServe("127.0.0.1:8080", ...)
+#      Read the client IP from X-Forwarded-For (e.g. with a middleware).
+#   2. Point DNS for example.com at this host.
+#   3. p8 validate examples/frameworks/go.flow
+#      sudo p8 up examples/frameworks/go.flow
+#   4. Verify:  curl -I https://example.com  → 200, http/2
+# =================================================================
+
+upstream goapp {
+  target http://127.0.0.1:8080
+  policy least_conn
+  retry { attempts 2 }
+}
+
+site example.com {
+  tls auto
+
+  route = /healthz ~> respond(status=204)
+
+  # gRPC service on the same host (uncomment if you serve gRPC on :9090).
+  # route /grpc.* ~> grpc(http://127.0.0.1:9090)
+
+  route /* ~> compress ~> proxy(@goapp)
+}

@@ -1,0 +1,42 @@
+# Phoenix / Elixir (LiveView) behind Pulsate
+# =================================================================
+# End-to-end: a Phoenix app with auto HTTPS, LiveView/Channels
+# WebSockets, static digest assets, and gzip.
+#
+# STEPS
+#   1. Build a release and run it on loopback:
+#        MIX_ENV=prod mix assets.deploy
+#        MIX_ENV=prod mix release
+#        PORT=4000 PHX_HOST=example.com _build/prod/rel/myapp/bin/myapp start
+#   2. In config/runtime.exs the Endpoint should listen on 127.0.0.1:4000 and
+#      have `check_origin` allow https://example.com.
+#   3. p8 validate examples/frameworks/phoenix.flow
+#      sudo p8 up examples/frameworks/phoenix.flow
+#   4. Verify LiveView:  open https://example.com — the socket should connect.
+# =================================================================
+
+upstream phoenix {
+  target http://127.0.0.1:4000
+  policy least_conn
+}
+
+cache static {
+  store memory { max 256MB }
+  default_ttl 1y
+  stale_while_revalidate 60s
+}
+
+site example.com {
+  tls auto
+
+  # Cache-busted assets compiled into priv/static.
+  route /assets/* ~> cache(@static)
+                  ~> compress
+                  ~> proxy(@phoenix)
+
+  # LiveView + user channels run over the /live and /socket WebSockets.
+  route /live/*   ~> ws(@phoenix)
+  route /socket/* ~> ws(@phoenix)
+
+  route /* ~> compress ~> proxy(@phoenix)
+}

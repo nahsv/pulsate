@@ -50,7 +50,8 @@ p8/
 │   ├── pulsate-sdk/            # guest-side SDK for plugin authors
 │   ├── pulsate-dashboard/      # embedded SPA assets + dashboard backend glue
 │   ├── pulsate-cli/            # command implementations (lib used by the bin)
-│   ├── pulsate-migrate/        # importers: nginx / Caddy / Traefik → Flow
+│   ├── pulsate-migrate/        # importers: nginx / Caddy / HAProxy / Apache → Flow
+│   ├── pulsate-k8s/            # Kubernetes Gateway API controller → live config
 │   └── pulsate-test/           # test harness, fakes, conformance utilities (dev-dep)
 ├── xtask/                    # cargo-xtask: dev automation (gen, dist, bench)
 ├── examples/                 # runnable example configs and apps
@@ -88,7 +89,8 @@ Shared dependencies are declared once in `[workspace.dependencies]` and inherite
 | `pulsate-sdk` | plugins | Guest-side ergonomic API for writing plugins in Rust (and a basis for other-language bindings) | — (no_std-friendly) |
 | `pulsate-dashboard` | dashboard | Embeds the built Svelte SPA (`rust-embed`); serves it; bridges to admin API + SSE/WS | rust-embed |
 | `pulsate-cli` | tooling | Implementation of every subcommand (so the bin stays thin and the CLI is testable) | clap, pulsate-config |
-| `pulsate-migrate` | tooling | Parse nginx/Caddy/Traefik configs; map to Flow; emit diffs and warnings | nom (for foreign formats) |
+| `pulsate-migrate` | tooling | Parse nginx/Caddy/HAProxy/Apache configs; map to Flow; emit fidelity notes | — (hand-written parsers) |
+| `pulsate-k8s` | tooling | Kubernetes Gateway API controller; reconcile Gateway/HTTPRoute into a live `ConfigSnapshot` via the admin reload path | kube, k8s-openapi |
 | `pulsate-test` | shared (dev) | Test fixtures, fake upstreams, a loopback harness, conformance helpers | — |
 
 ## Dependency graph

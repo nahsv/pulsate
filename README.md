@@ -2,7 +2,7 @@
 
 [![crates.io](https://img.shields.io/crates/v/pulsate.svg)](https://crates.io/crates/pulsate)
 [![docs.rs](https://img.shields.io/docsrs/pulsate)](https://docs.rs/pulsate)
-[![CI](https://github.com/nahsv/pulsate/actions/workflows/ci.yml/badge.svg)](https://github.com/nahsv/pulsate/actions/workflows/ci.yml)
+[![CI](https://github.com/squaretick/pulsate/actions/workflows/ci.yml/badge.svg)](https://github.com/squaretick/pulsate/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](#license)
 
 A reverse-proxy gateway written in Rust. One static binary, one config file, one
@@ -25,24 +25,24 @@ Every channel installs two identical binaries: **`pulsate`** and its short alias
 
 ```sh
 # Shell installer (Linux/macOS) — downloads the prebuilt release binary
-curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/nahsv/pulsate/main/scripts/install.sh | sh
+curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/squaretick/pulsate/main/scripts/install.sh | sh
 
 # Cargo (any platform with Rust)
 cargo install pulsate
 cargo binstall pulsate           # prebuilt binary, no compile
 
 # Homebrew (macOS/Linux)
-brew install nahsv/tap/pulsate
+brew install squaretick/tap/pulsate
 
 # Debian / Ubuntu
-curl -fsSLO https://github.com/nahsv/pulsate/releases/latest/download/pulsate_amd64.deb
+curl -fsSLO https://github.com/squaretick/pulsate/releases/latest/download/pulsate_amd64.deb
 sudo apt install ./pulsate_amd64.deb
 
 # Fedora / RHEL
-sudo dnf install https://github.com/nahsv/pulsate/releases/latest/download/pulsate.x86_64.rpm
+sudo dnf install https://github.com/squaretick/pulsate/releases/latest/download/pulsate.x86_64.rpm
 
 # Docker
-docker run --rm -p 8080:8080 ghcr.io/nahsv/pulsate:latest
+docker run --rm -p 8080:8080 ghcr.io/squaretick/pulsate:latest
 ```
 
 Or build from source (Rust 1.86+):
@@ -103,8 +103,8 @@ site app.example.com {
   plus an embedded dashboard.
 - **Extensibility** — a capability-sandboxed WASM plugin host (Wasmtime) with a
   fuel budget and ABI versioning.
-- **Migration** — `p8 import nginx|caddy` translates an existing config to
-  Flow and reports the fidelity of every mapping.
+- **Migration** — `p8 import nginx|caddy|haproxy|apache` translates an existing
+  config to Flow and reports the fidelity of every mapping.
 
 ## Configuration
 
@@ -157,7 +157,7 @@ admin API, the error catalog, and more. Kubernetes manifests live in
 Implemented and tested: the HTTP/1.1 + HTTP/2 data plane, the Flow language and
 snapshot/reload machinery, the reverse proxy, the middleware pipeline, caching,
 the WAF and rate limiting, observability, the admin API and dashboard, the WASM
-plugin host, and the nginx/Caddy importers.
+plugin host, and the nginx/Caddy/HAProxy/Apache importers.
 
 Not yet wired up: live ACME certificate issuance (the challenge and certificate
 stores exist; the protocol client does not), the QUIC/HTTP-3 transport (only

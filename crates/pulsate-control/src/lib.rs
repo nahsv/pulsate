@@ -6,11 +6,30 @@
 //! dashboard. Every privileged action checks a scope; errors are
 //! `application/problem+json` keyed to `PLS-ADM-*` codes.
 //!
-//! The gRPC surface and event streams are not implemented.
+//! A parallel gRPC surface ([`serve_grpc`]) exposes the same operations over
+//! `tonic`, plus a server-streaming event feed ([`AdminEvent`]). Both surfaces
+//! share one [`AdminApi`] — the same token table, RBAC scopes, and event bus.
 #![forbid(unsafe_code)]
 
+mod grpc;
 mod json;
 mod serve;
+
+/// Generated `tonic`/`prost` types for the `pulsate.admin.v1` service.
+///
+/// This module is machine-generated, so the crate's pedantic lints and the
+/// missing-docs gate are relaxed for its contents only.
+#[allow(
+    clippy::all,
+    clippy::pedantic,
+    clippy::nursery,
+    missing_docs,
+    unreachable_pub,
+    clippy::derive_partial_eq_without_eq
+)]
+mod proto {
+    tonic::include_proto!("pulsate.admin.v1");
+}
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -18,9 +37,37 @@ use std::sync::Arc;
 use pulsate_config::ConfigStore;
 use pulsate_http::Gateway;
 use pulsate_waf::AuditLog;
+use tokio::sync::broadcast;
 
 #[doc(inline)]
+pub use grpc::serve_grpc;
+#[doc(inline)]
 pub use serve::serve_admin;
+
+/// An event published on the admin event bus and surfaced over `WatchEvents`.
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum AdminEvent {
+    /// The configuration was reloaded to a new generation.
+    ConfigReloaded {
+        /// The newly-published generation number.
+        generation: u64,
+    },
+    /// The process lifecycle state changed.
+    LifecycleChanged {
+        /// The new lifecycle state, rendered as a string.
+        state: String,
+    },
+    /// A new entry was appended to the audit log.
+    AuditAppended {
+        /// The entry's sequence number.
+        seq: u64,
+        /// The event description.
+        event: String,
+        /// The entry's hash, hex-rendered.
+        hash: String,
+    },
+}
 
 /// RBAC scopes a token may hold.
 #[derive(Debug, Clone, Copy, Default)]
@@ -67,6 +114,7 @@ pub struct AdminApi {
     gateway: Arc<Gateway>,
     audit: Arc<AuditLog>,
     tokens: HashMap<String, Scopes>,
+    events: broadcast::Sender<AdminEvent>,
 }
 
 impl AdminApi {
@@ -81,11 +129,13 @@ impl AdminApi {
     ) -> Self {
         let mut tokens = HashMap::new();
         tokens.insert(admin_token.into(), Scopes::all());
+        let (events, _) = broadcast::channel(128);
         Self {
             store,
             gateway,
             audit,
             tokens,
+            events,
         }
     }
 
@@ -97,6 +147,18 @@ impl AdminApi {
     /// Resolve the scopes for a bearer token, if known.
     fn scopes_for(&self, token: &str) -> Option<Scopes> {
         self.tokens.get(token).copied()
+    }
+
+    /// Subscribe to the admin event bus. Each subscriber receives every event
+    /// published after it subscribed; slow consumers may observe lag.
+    #[must_use]
+    pub fn subscribe(&self) -> broadcast::Receiver<AdminEvent> {
+        self.events.subscribe()
+    }
+
+    /// Publish an event to every current subscriber. Dropped if there are none.
+    pub fn publish(&self, event: AdminEvent) {
+        let _ = self.events.send(event);
     }
 }
 

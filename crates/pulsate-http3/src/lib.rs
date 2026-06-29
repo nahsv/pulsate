@@ -1,13 +1,24 @@
-//! `pulsate-http3` — HTTP/3 discovery.
+//! `pulsate-http3` — HTTP/3 discovery **and** a QUIC/HTTP-3 transport.
 //!
-//! The discovery half of HTTP/3: the `Alt-Svc` advertisement that tells clients
-//! an `h3` endpoint is available, plus the typed config a listener uses to enable
-//! it (`docs/05-http-stack.md`). When `h3` is enabled, the HTTP/1 and HTTP/2
-//! responses carry `Alt-Svc: h3=":<port>"`, so a compliant client upgrades its
-//! *next* connection to QUIC.
+//! Two halves of HTTP/3 live here:
 //!
-//! The QUIC/h3 transport itself is not implemented.
+//! 1. **Discovery** ([`Http3Config`]): the `Alt-Svc` advertisement that tells
+//!    clients an `h3` endpoint is available. When `h3` is enabled the HTTP/1 and
+//!    HTTP/2 responses carry `Alt-Svc: h3=":<port>"`, so a compliant client
+//!    upgrades its *next* connection to QUIC (`docs/05-http-stack.md`).
+//! 2. **Transport** ([`Http3Listener`]): a `quinn` UDP endpoint speaking QUIC +
+//!    HTTP/3 (`h3`/`h3-quinn`). Each request is bridged through the same routing,
+//!    middleware, cache, and proxy core the HTTP/1 and HTTP/2 listeners use, so
+//!    behaviour is identical across protocols.
+//!
+//! 0-RTT (early data) is intentionally disabled; see [`server`] for the rationale.
 #![forbid(unsafe_code)]
+
+pub mod dispatch;
+pub mod server;
+
+#[doc(inline)]
+pub use server::{Http3Error, Http3Listener, TransportConfig};
 
 /// HTTP/3 listener configuration.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

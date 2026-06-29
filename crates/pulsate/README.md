@@ -9,6 +9,6 @@ cargo install pulsate            # installs the `pulsate` binary and its `p8` al
 pulsate up pulsate.flow
 ```
 
-See the [project README](https://github.com/nahsv/pulsate) for the
+See the [project README](https://github.com/squaretick/pulsate) for the
 configuration language, architecture, and the other install channels (Homebrew,
 apt/dnf, Docker).

@@ -1,0 +1,35 @@
+# Spring Boot (Java) behind Pulsate
+# =================================================================
+# End-to-end: a Spring Boot app with auto HTTPS, gzip, Actuator
+# locked down, and WebSocket/STOMP support.
+#
+# STEPS
+#   1. Run the jar on loopback:
+#        java -jar app.jar --server.address=127.0.0.1 --server.port=8080
+#      In application.properties:
+#        server.forward-headers-strategy=framework
+#   2. Point DNS for example.com at this host.
+#   3. p8 validate examples/frameworks/spring-boot.flow
+#      sudo p8 up examples/frameworks/spring-boot.flow
+#   4. Verify:  curl -I https://example.com  → 200, http/2
+# =================================================================
+
+upstream boot {
+  target http://127.0.0.1:8080
+  policy least_conn
+  retry { attempts 2 }
+}
+
+site example.com {
+  tls auto
+
+  # Keep Actuator private — office IPs + basic auth.
+  route /actuator/* ~> require(ip=["203.0.113.0/24"])
+                    ~> basic_auth(realm="ops")
+                    ~> proxy(@boot)
+
+  # STOMP-over-WebSocket endpoint.
+  route /ws/* ~> ws(@boot)
+
+  route /* ~> compress ~> proxy(@boot)
+}
