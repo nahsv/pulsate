@@ -1,0 +1,16 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [0.2.0](https://github.com/squaretick/pulsate/compare/pulsate-core-v0.1.0...pulsate-core-v0.2.0) - 2026-06-29
+
+### Other
+
+- Rebrand to squaretick; add k8s, http/3, grpc, clustering
+- Add docs, dual-license, and security policy
+- Add release workflow, packaging, and docs
