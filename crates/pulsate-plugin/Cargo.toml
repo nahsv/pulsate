@@ -8,7 +8,7 @@ repository.workspace = true
 description = "WASM plugin host (Wasmtime): fuel/epoch limits, capability sandbox, ABI versioning."
 
 [dependencies]
-pulsate-core = { path = "../pulsate-core", version = "0.2.0" }
+pulsate-core = { path = "../pulsate-core", version = "0.2.1" }
 wasmtime = { version = "36.0.7", default-features = false, features = [
     "cranelift",
     "runtime",

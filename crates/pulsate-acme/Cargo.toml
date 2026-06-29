@@ -8,8 +8,8 @@ repository.workspace = true
 description = "ACME plumbing: HTTP-01 challenge store, dynamic (live-updatable) certificate store, on-demand allow-list."
 
 [dependencies]
-pulsate-core = { path = "../pulsate-core", version = "0.2.0" }
-pulsate-tls = { path = "../pulsate-tls", version = "0.2.0" }
+pulsate-core = { path = "../pulsate-core", version = "0.2.1" }
+pulsate-tls = { path = "../pulsate-tls", version = "0.2.1" }
 rustls.workspace = true
 
 # JOSE / ACME account crypto (RFC 8555, RFC 7515/7518/7638).

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1](https://github.com/squaretick/pulsate/compare/v0.2.0...v0.2.1) - 2026-06-29
+
+### Other
+
+- expand CLI and crates documentation
+- Remove p8 binary alias, standardize on pulsate
+
 ## [0.2.0](https://github.com/squaretick/pulsate/compare/v0.1.0...v0.2.0) - 2026-06-29
 
 ### Other

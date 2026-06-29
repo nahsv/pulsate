@@ -8,7 +8,7 @@ repository.workspace = true
 description = "rustls server configuration: SNI certificate resolution, ALPN, manual certs (mTLS to follow)."
 
 [dependencies]
-pulsate-core = { path = "../pulsate-core", version = "0.2.0" }
+pulsate-core = { path = "../pulsate-core", version = "0.2.1" }
 rustls.workspace = true
 tokio-rustls.workspace = true
 rustls-pemfile.workspace = true

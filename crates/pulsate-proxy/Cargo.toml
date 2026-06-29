@@ -8,8 +8,8 @@ repository.workspace = true
 description = "Reverse proxy: upstream pools, load balancing, retries, passive ejection / circuit breaking, forwarded headers."
 
 [dependencies]
-pulsate-core = { path = "../pulsate-core", version = "0.2.0" }
-pulsate-rt = { path = "../pulsate-rt", version = "0.2.0" }
+pulsate-core = { path = "../pulsate-core", version = "0.2.1" }
+pulsate-rt = { path = "../pulsate-rt", version = "0.2.1" }
 http.workspace = true
 bytes.workspace = true
 hyper.workspace = true

@@ -34,7 +34,7 @@ members = [
 # Single source of truth for shared package metadata. Member crates inherit via
 # `version.workspace = true` etc. so versions never drift (docs/03-repository.md).
 [workspace.package]
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 rust-version = "1.86"
 license = "Apache-2.0"

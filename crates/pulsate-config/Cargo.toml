@@ -8,13 +8,13 @@ repository.workspace = true
 description = "Typed config model, snapshot build, validation, and the arc-swap-published config store."
 
 [dependencies]
-pulsate-core = { path = "../pulsate-core", version = "0.2.0" }
-pulsate-flow = { path = "../pulsate-flow", version = "0.2.0" }
-pulsate-router = { path = "../pulsate-router", version = "0.2.0" }
-pulsate-proxy = { path = "../pulsate-proxy", version = "0.2.0" }
-pulsate-pipeline = { path = "../pulsate-pipeline", version = "0.2.0" }
-pulsate-cache = { path = "../pulsate-cache", version = "0.2.0" }
-pulsate-waf = { path = "../pulsate-waf", version = "0.2.0" }
+pulsate-core = { path = "../pulsate-core", version = "0.2.1" }
+pulsate-flow = { path = "../pulsate-flow", version = "0.2.1" }
+pulsate-router = { path = "../pulsate-router", version = "0.2.1" }
+pulsate-proxy = { path = "../pulsate-proxy", version = "0.2.1" }
+pulsate-pipeline = { path = "../pulsate-pipeline", version = "0.2.1" }
+pulsate-cache = { path = "../pulsate-cache", version = "0.2.1" }
+pulsate-waf = { path = "../pulsate-waf", version = "0.2.1" }
 arc-swap.workspace = true
 
 [lints]

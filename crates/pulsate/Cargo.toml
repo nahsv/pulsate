@@ -20,9 +20,9 @@ categories = [
 # thin wrapper, discovered automatically.
 
 [dependencies]
-pulsate-core = { path = "../pulsate-core", version = "0.2.0" }
-pulsate-rt = { path = "../pulsate-rt", version = "0.2.0" }
-pulsate-cli = { path = "../pulsate-cli", version = "0.2.0" }
+pulsate-core = { path = "../pulsate-core", version = "0.2.1" }
+pulsate-rt = { path = "../pulsate-rt", version = "0.2.1" }
+pulsate-cli = { path = "../pulsate-cli", version = "0.2.1" }
 clap.workspace = true
 anyhow.workspace = true
 

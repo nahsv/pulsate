@@ -8,17 +8,17 @@ repository.workspace = true
 description = "Implementations of the `pulsate` subcommands (kept here so the binary stays thin and the CLI is testable)."
 
 [dependencies]
-pulsate-core = { path = "../pulsate-core", version = "0.2.0" }
-pulsate-config = { path = "../pulsate-config", version = "0.2.0" }
-pulsate-router = { path = "../pulsate-router", version = "0.2.0" }
-pulsate-net = { path = "../pulsate-net", version = "0.2.0" }
-pulsate-http = { path = "../pulsate-http", version = "0.2.0" }
-pulsate-tls = { path = "../pulsate-tls", version = "0.2.0" }
-pulsate-control = { path = "../pulsate-control", version = "0.2.0" }
-pulsate-waf = { path = "../pulsate-waf", version = "0.2.0" }
-pulsate-http3 = { path = "../pulsate-http3", version = "0.2.0" }
-pulsate-plugin = { path = "../pulsate-plugin", version = "0.2.0" }
-pulsate-migrate = { path = "../pulsate-migrate", version = "0.2.0" }
+pulsate-core = { path = "../pulsate-core", version = "0.2.1" }
+pulsate-config = { path = "../pulsate-config", version = "0.2.1" }
+pulsate-router = { path = "../pulsate-router", version = "0.2.1" }
+pulsate-net = { path = "../pulsate-net", version = "0.2.1" }
+pulsate-http = { path = "../pulsate-http", version = "0.2.1" }
+pulsate-tls = { path = "../pulsate-tls", version = "0.2.1" }
+pulsate-control = { path = "../pulsate-control", version = "0.2.1" }
+pulsate-waf = { path = "../pulsate-waf", version = "0.2.1" }
+pulsate-http3 = { path = "../pulsate-http3", version = "0.2.1" }
+pulsate-plugin = { path = "../pulsate-plugin", version = "0.2.1" }
+pulsate-migrate = { path = "../pulsate-migrate", version = "0.2.1" }
 tokio = { workspace = true, features = [
     "rt",
     "rt-multi-thread",

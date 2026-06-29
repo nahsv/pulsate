@@ -8,9 +8,9 @@ repository.workspace = true
 description = "Routing table + matchers (host/path/regex/method/weighted)."
 
 [dependencies]
-pulsate-core = { path = "../pulsate-core", version = "0.2.0" }
-pulsate-pipeline = { path = "../pulsate-pipeline", version = "0.2.0" }
-pulsate-cache = { path = "../pulsate-cache", version = "0.2.0" }
+pulsate-core = { path = "../pulsate-core", version = "0.2.1" }
+pulsate-pipeline = { path = "../pulsate-pipeline", version = "0.2.1" }
+pulsate-cache = { path = "../pulsate-cache", version = "0.2.1" }
 
 [lints]
 workspace = true

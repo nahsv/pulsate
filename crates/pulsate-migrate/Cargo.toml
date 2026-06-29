@@ -10,7 +10,7 @@ description = "Config importers: nginx / Caddy / HAProxy / Apache → Flow, with
 [dependencies]
 
 [dev-dependencies]
-pulsate-flow = { path = "../pulsate-flow", version = "0.2.0" }
+pulsate-flow = { path = "../pulsate-flow", version = "0.2.1" }
 
 [lints]
 workspace = true

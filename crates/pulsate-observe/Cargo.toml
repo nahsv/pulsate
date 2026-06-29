@@ -8,7 +8,7 @@ repository.workspace = true
 description = "Observability: Prometheus metrics + exposition, request IDs, structured JSON access logs."
 
 [dependencies]
-pulsate-core = { path = "../pulsate-core", version = "0.2.0" }
+pulsate-core = { path = "../pulsate-core", version = "0.2.1" }
 
 [lints]
 workspace = true

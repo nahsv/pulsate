@@ -8,13 +8,13 @@ repository.workspace = true
 description = "HTTP/1.1 serving over hyper: normalize to Request/Response and execute terminal handlers."
 
 [dependencies]
-pulsate-core = { path = "../pulsate-core", version = "0.2.0" }
-pulsate-rt = { path = "../pulsate-rt", version = "0.2.0" }
-pulsate-router = { path = "../pulsate-router", version = "0.2.0" }
-pulsate-proxy = { path = "../pulsate-proxy", version = "0.2.0" }
-pulsate-pipeline = { path = "../pulsate-pipeline", version = "0.2.0" }
-pulsate-observe = { path = "../pulsate-observe", version = "0.2.0" }
-pulsate-cache = { path = "../pulsate-cache", version = "0.2.0" }
+pulsate-core = { path = "../pulsate-core", version = "0.2.1" }
+pulsate-rt = { path = "../pulsate-rt", version = "0.2.1" }
+pulsate-router = { path = "../pulsate-router", version = "0.2.1" }
+pulsate-proxy = { path = "../pulsate-proxy", version = "0.2.1" }
+pulsate-pipeline = { path = "../pulsate-pipeline", version = "0.2.1" }
+pulsate-observe = { path = "../pulsate-observe", version = "0.2.1" }
+pulsate-cache = { path = "../pulsate-cache", version = "0.2.1" }
 hyper.workspace = true
 hyper-util.workspace = true
 http-body-util.workspace = true

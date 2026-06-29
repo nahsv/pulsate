@@ -8,7 +8,7 @@ repository.workspace = true
 description = "Clustering: membership, leader/peer roles, shared state."
 
 [dependencies]
-pulsate-core = { path = "../pulsate-core", version = "0.2.0" }
+pulsate-core = { path = "../pulsate-core", version = "0.2.1" }
 tokio = { version = "1", features = ["net", "time", "rt", "sync", "macros"] }
 serde = { version = "1", features = ["derive"] }
 postcard = { version = "1", default-features = false, features = ["use-std"] }

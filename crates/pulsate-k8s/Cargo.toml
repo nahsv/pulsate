@@ -8,7 +8,7 @@ repository.workspace = true
 description = "Kubernetes Gateway API controller: reconciles GatewayClass/Gateway/HTTPRoute into a live pulsate-config snapshot via the same atomic-swap path as admin reload."
 
 [dependencies]
-pulsate-config = { path = "../pulsate-config", version = "0.2.0" }
+pulsate-config = { path = "../pulsate-config", version = "0.2.1" }
 
 # Kubernetes client + controller runtime. A resolvable pair: kube 0.95 targets
 # k8s-openapi 0.23, and the `v1_31` feature picks the matching API surface.

@@ -8,11 +8,11 @@ repository.workspace = true
 description = "Control-plane orchestrator and REST admin API (token auth + RBAC, loopback by default)."
 
 [dependencies]
-pulsate-core = { path = "../pulsate-core", version = "0.2.0" }
-pulsate-config = { path = "../pulsate-config", version = "0.2.0" }
-pulsate-http = { path = "../pulsate-http", version = "0.2.0" }
-pulsate-waf = { path = "../pulsate-waf", version = "0.2.0" }
-pulsate-dashboard = { path = "../pulsate-dashboard", version = "0.2.0" }
+pulsate-core = { path = "../pulsate-core", version = "0.2.1" }
+pulsate-config = { path = "../pulsate-config", version = "0.2.1" }
+pulsate-http = { path = "../pulsate-http", version = "0.2.1" }
+pulsate-waf = { path = "../pulsate-waf", version = "0.2.1" }
+pulsate-dashboard = { path = "../pulsate-dashboard", version = "0.2.1" }
 hyper.workspace = true
 hyper-util.workspace = true
 http-body-util.workspace = true
@@ -31,8 +31,8 @@ protoc-bin-vendored = "3"
 
 [dev-dependencies]
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread", "net", "io-util", "time"] }
-pulsate-proxy = { path = "../pulsate-proxy", version = "0.2.0" }
-pulsate-router = { path = "../pulsate-router", version = "0.2.0" }
+pulsate-proxy = { path = "../pulsate-proxy", version = "0.2.1" }
+pulsate-router = { path = "../pulsate-router", version = "0.2.1" }
 
 [lints]
 workspace = true

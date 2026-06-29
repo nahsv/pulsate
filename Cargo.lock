@@ -1984,7 +1984,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "anyhow",
  "clap",
@@ -1995,7 +1995,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate-acme"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "base64ct",
  "bytes",
@@ -2018,7 +2018,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate-cache"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "bytes",
  "http",
@@ -2027,7 +2027,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate-cli"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "pulsate-config",
  "pulsate-control",
@@ -2045,7 +2045,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate-cluster"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "postcard",
  "pulsate-core",
@@ -2055,7 +2055,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate-config"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "arc-swap",
  "pulsate-cache",
@@ -2069,7 +2069,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate-control"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "bytes",
  "http",
@@ -2093,7 +2093,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate-core"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "bytes",
  "http",
@@ -2102,11 +2102,11 @@ dependencies = [
 
 [[package]]
 name = "pulsate-dashboard"
-version = "0.2.0"
+version = "0.2.1"
 
 [[package]]
 name = "pulsate-flow"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "pulsate-core",
  "pulsate-util",
@@ -2114,7 +2114,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate-http"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "bytes",
  "http",
@@ -2133,7 +2133,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate-http3"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "bytes",
  "h3",
@@ -2155,7 +2155,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate-k8s"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "futures",
  "k8s-openapi",
@@ -2171,14 +2171,14 @@ dependencies = [
 
 [[package]]
 name = "pulsate-migrate"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "pulsate-flow",
 ]
 
 [[package]]
 name = "pulsate-net"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "pulsate-core",
  "pulsate-rt",
@@ -2188,14 +2188,14 @@ dependencies = [
 
 [[package]]
 name = "pulsate-observe"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "pulsate-core",
 ]
 
 [[package]]
 name = "pulsate-pipeline"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "http",
  "pulsate-core",
@@ -2204,7 +2204,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate-plugin"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "pulsate-core",
  "wasmtime",
@@ -2212,7 +2212,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate-proxy"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "bytes",
  "http",
@@ -2226,7 +2226,7 @@ dependencies = [
 
 [[package]]
 name = "pulsate-router"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "pulsate-cache",
  "pulsate-core",
@@ -2235,32 +2235,32 @@ dependencies = [
 
 [[package]]
 name = "pulsate-rt"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "tokio",
 ]
 
 [[package]]
 name = "pulsate-sdk"
-version = "0.2.0"
+version = "0.2.1"
 
 [[package]]
 name = "pulsate-secrets"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "pulsate-core",
 ]
 
 [[package]]
 name = "pulsate-test"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "pulsate-core",
 ]
 
 [[package]]
 name = "pulsate-tls"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "pulsate-core",
  "rcgen",
@@ -2271,14 +2271,14 @@ dependencies = [
 
 [[package]]
 name = "pulsate-util"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "bytes",
 ]
 
 [[package]]
 name = "pulsate-waf"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "pulsate-core",
 ]
@@ -3786,7 +3786,7 @@ checksum = "1ebf944e87a7c253233ad6766e082e3cd714b5d03812acc24c318f549614536e"
 
 [[package]]
 name = "xtask"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "clap",
 ]
