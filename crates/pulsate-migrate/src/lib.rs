@@ -1,6 +1,6 @@
 //! `pulsate-migrate` — import nginx / Caddy / HAProxy / Apache configs into Flow.
 //!
-//! The `p8 import` engine (`docs/30-migration-and-import.md`): parse a foreign
+//! The `pulsate import` engine (`docs/30-migration-and-import.md`): parse a foreign
 //! config, translate the constructs it understands into Flow, and report the
 //! *fidelity* of every mapping so an operator knows exactly what was translated
 //! exactly, approximated, or left for manual review. An honest, reviewable

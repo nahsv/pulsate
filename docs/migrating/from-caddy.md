@@ -4,8 +4,8 @@ Caddy and Pulsate share a philosophy — automatic HTTPS, a readable config — 
 this is usually the smoothest migration. Auto-translate first:
 
 ```sh
-p8 import caddy ./Caddyfile --diff
-p8 import caddy ./Caddyfile -o pulsate.flow
+pulsate import caddy ./Caddyfile --diff
+pulsate import caddy ./Caddyfile -o pulsate.flow
 ```
 
 ## Side by side

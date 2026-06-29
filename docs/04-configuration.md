@@ -114,7 +114,7 @@ pulsate {
   https { port 443 }                # TLS listener
   http3 on                          # enable HTTP/3 on the https port
   workers 0                         # 0 = auto (one per core); N = prefork processes
-  user  "p8"; group "p8"      # privilege drop after binding
+  user  "pulsate"; group "pulsate"      # privilege drop after binding
   admin { listen 127.0.0.1:9180 }   # admin API/dashboard, loopback by default
   runtime { worker_threads 0; pin_workers off }
   shutdown { grace 30s }
@@ -172,7 +172,7 @@ Secure by default: a `site` with no `tls` directive still gets automatic HTTPS.
 ```
 # Automatic (ACME) — the default
 site shop.example.com {
-  tls auto                               # provider/email taken from defaults or p8{}
+  tls auto                               # provider/email taken from defaults or pulsate{}
 }
 
 # Explicit ACME settings
@@ -187,11 +187,11 @@ acme {
 # Manual certificates
 site internal.example.com {
   tls {
-    cert "/etc/p8/certs/internal.crt"
+    cert "/etc/pulsate/certs/internal.crt"
     key  secret://internal_key
     min_version 1.2
     ciphers modern                       # modern | intermediate | custom list
-    client_auth { mode require; ca "/etc/p8/ca.pem" }   # mTLS
+    client_auth { mode require; ca "/etc/pulsate/ca.pem" }   # mTLS
   }
 }
 
@@ -275,7 +275,7 @@ A named cache defines a store and policy; routes opt in with `cache(@name)`:
 ```
 cache www_cache {
   store     memory { max 512MB }            # memory | disk { path, max } | redis { url }
-  # store   disk { path "/var/cache/p8"; max 10GB }
+  # store   disk { path "/var/cache/pulsate"; max 10GB }
   # store   redis { url secret://redis_url }
 
   default_ttl   5m
@@ -301,7 +301,7 @@ Conditional requests (ETag/Last-Modified), range requests, tag-based invalidatio
 waf default {
   mode      block                 # block | detect (log only)
   rules     [owasp_crs, custom]   # built-in rulesets + named custom rules
-  custom    "/etc/p8/waf/*.rules"
+  custom    "/etc/pulsate/waf/*.rules"
   geo       { block [RU, KP]; allow [] }     # ISO country codes
   asn       { block [AS13335] }
   bot       { mode challenge; allow [googlebot] }   # challenge | block | allow
@@ -362,7 +362,7 @@ Security headers are applied secure-by-default from `defaults`; per-route `heade
 log {
   level   info                      # error|warn|info|debug|trace
   format  json                      # json | text
-  output  stdout                    # stdout | file "/var/log/p8.log" | both
+  output  stdout                    # stdout | file "/var/log/pulsate.log" | both
   access  { enabled true; fields [ts, method, host, path, status, dur_ms, upstream, req_id] }
   sample  { success 0.1 }           # sample 10% of 2xx access logs (errors always logged)
 }
@@ -386,7 +386,7 @@ Metric names, trace spans, and request-ID propagation are catalogued in [15. Obs
 
 ```
 plugins {
-  dir "/etc/p8/plugins"          # where .wasm components live
+  dir "/etc/pulsate/plugins"          # where .wasm components live
   load geoblock { source "geoblock.wasm"; config { db "/etc/geo.mmdb" } }
   load mytransform { source "oci://registry.example.com/plugins/transform:1.2.0" }
 }
@@ -424,7 +424,7 @@ acme { dns { provider cloudflare; api_token secret://cf_token } }
 
 ## Validation & error reporting
 
-`p8 validate pulsate.flow` (and every reload) runs the full pipeline from [02. Architecture](02-architecture.md#configuration-loading). Errors are rendered with the span and a fix hint:
+`pulsate validate pulsate.flow` (and every reload) runs the full pipeline from [02. Architecture](02-architecture.md#configuration-loading). Errors are rendered with the span and a fix hint:
 
 ```
 error[PLS-CFG-0007]: unknown upstream reference
@@ -486,11 +486,11 @@ waf strict { mode block; rules [owasp_crs]; geo { block [KP] }; bot { mode chall
 
 upstream backend {
   target https://10.1.0.10:8443
-  tls { client_cert "/etc/p8/id.crt"; client_key secret://id_key; ca "/etc/p8/upstream-ca.pem" }
+  tls { client_cert "/etc/pulsate/id.crt"; client_key secret://id_key; ca "/etc/pulsate/upstream-ca.pem" }
 }
 
 site api.example.com {
-  tls { cert "/etc/p8/api.crt"; key secret://api_key; min_version 1.3; client_auth { mode request; ca "/etc/p8/clients-ca.pem" } }
+  tls { cert "/etc/pulsate/api.crt"; key secret://api_key; min_version 1.3; client_auth { mode request; ca "/etc/pulsate/clients-ca.pem" } }
   route /* ~> waf(@strict)
           ~> rate_limit(2000/min, key=[ip, header.x-api-key])
           ~> headers(set={ strict-transport-security: "max-age=63072000" }, remove=[server])

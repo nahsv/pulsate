@@ -42,9 +42,9 @@ A single node is still a SPOF for *availability* (the box can die) — productio
 ## Backup & restore
 
 What to back up and how:
-- **Config (`pulsate.flow`):** the source of truth lives in your VCS/CRD — that *is* the config backup (GitOps). `p8 config dump --effective` captures the resolved view for audit.
-- **State (`data_dir`):** certs, ACME account/keys, ticket keys, cache index, audit. Back up via `p8 backup` (a consistent snapshot of `state.redb` + manifests) on a schedule to off-host/object storage. Cache *blobs* are regenerable and can be excluded to shrink backups.
-- **Restore:** `p8 restore <backup>` repopulates `data_dir`; on start, Pulsate validates schema, decrypts keys via the KMS/secrets backend, and resumes. Certs are immediately usable (no re-issuance needed).
+- **Config (`pulsate.flow`):** the source of truth lives in your VCS/CRD — that *is* the config backup (GitOps). `pulsate config dump --effective` captures the resolved view for audit.
+- **State (`data_dir`):** certs, ACME account/keys, ticket keys, cache index, audit. Back up via `pulsate backup` (a consistent snapshot of `state.redb` + manifests) on a schedule to off-host/object storage. Cache *blobs* are regenerable and can be excluded to shrink backups.
+- **Restore:** `pulsate restore <backup>` repopulates `data_dir`; on start, Pulsate validates schema, decrypts keys via the KMS/secrets backend, and resumes. Certs are immediately usable (no re-issuance needed).
 - **Encryption:** backups are encrypted (KMS-wrapped) so a leaked backup doesn't leak keys ([09. Security](09-security.md)).
 - **Tested restores:** restore drills are part of the runbooks (a backup you haven't restored is a hope, not a backup).
 
@@ -103,7 +103,7 @@ Shipped operational runbooks (in [17. Documentation](17-documentation.md)) cover
 - Cluster partition response and post-heal verification.
 - Region failover and failback.
 - Cache/origin incident (enable serve-stale, purge after fix).
-Each runbook lists the exact `p8`/admin-API commands, the metrics/alerts that trigger it, and verification steps.
+Each runbook lists the exact `pulsate`/admin-API commands, the metrics/alerts that trigger it, and verification steps.
 
 ## Cross-references
 - [16. Deployment](16-deployment.md) — cluster topology and zero-downtime upgrades.

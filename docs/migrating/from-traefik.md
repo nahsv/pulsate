@@ -4,8 +4,8 @@ Traefik's router/service/middleware model maps cleanly onto Flow's
 route/upstream/pipeline.
 
 > **No automatic Traefik importer yet.** Unlike nginx, Caddy, HAProxy, and
-> Apache, there is no `p8 import traefik` command — this is a manual migration
-> guide. If you also run one of those sources, `p8 import nginx|caddy|haproxy|apache`
+> Apache, there is no `pulsate import traefik` command — this is a manual migration
+> guide. If you also run one of those sources, `pulsate import nginx|caddy|haproxy|apache`
 > can translate it for you; see [29/30](../30-migration-and-import.md). The
 > mapping below is mechanical, so the by-hand translation is usually short.
 

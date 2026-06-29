@@ -43,7 +43,7 @@ impl Stmt {
 /// A `keyword [args] { body }` block.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Block {
-    /// The leading keyword (e.g. `site`, `upstream`, `p8`).
+    /// The leading keyword (e.g. `site`, `upstream`, `pulsate`).
     pub keyword: Spanned<String>,
     /// Positional/named arguments before the brace (e.g. `site example.com`).
     pub args: Vec<Arg>,

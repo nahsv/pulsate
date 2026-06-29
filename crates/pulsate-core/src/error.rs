@@ -20,7 +20,7 @@ pub enum Category {
     Client,
     /// A backend failed — surfaces as 502/503/504.
     Upstream,
-    /// Invalid configuration — surfaces at load time / `p8 validate` / 422.
+    /// Invalid configuration — surfaces at load time / `pulsate validate` / 422.
     Config,
     /// Blocked by policy — surfaces as 401/403/429.
     Security,

@@ -9,7 +9,7 @@ use crate::{Builder, Fidelity, Import};
 /// Import a Caddyfile into Flow.
 pub fn import(text: &str) -> Import {
     let mut b = Builder::default();
-    b.line("# Imported from Caddy by `p8 import caddy`. Review the notes.");
+    b.line("# Imported from Caddy by `pulsate import caddy`. Review the notes.");
 
     let mut site: Option<Vec<String>> = None;
     let mut root: Option<String> = None;

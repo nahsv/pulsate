@@ -33,7 +33,7 @@ Ten pillars. Each is a *constraint* the architecture is held to, not a slogan.
 
 1. **One binary.** Pulsate ships as a single static executable with no runtime dependencies — no OpenSSL, no Lua interpreter, no Node process for the UI, no separate agent. Rationale: distribution and operability are features. Every external dependency is a deployment failure mode and a supply-chain surface. (Enforced by technology choices: rustls over OpenSSL, an embedded Svelte dashboard, an in-process WASM runtime — see [Canon / Technology decisions](02-architecture.md).)
 2. **One config.** A single file, `pulsate.flow`, written in an original, purpose-built configuration language (see [04. Configuration](04-configuration.md)). Not YAML, not a templated `nginx.conf`, not an annotation soup spread across Kubernetes objects. Configuration is the primary product surface and is designed as such.
-3. **One command.** `p8 up` takes you from nothing to a running, TLS-terminated gateway. Everything else (`validate`, `reload`, `cert`, `bench`, `import`) is a subcommand of the same binary (see [13. CLI](13-cli.md)).
+3. **One command.** `pulsate up` takes you from nothing to a running, TLS-terminated gateway. Everything else (`validate`, `reload`, `cert`, `bench`, `import`) is a subcommand of the same binary (see [13. CLI](13-cli.md)).
 4. **Secure by default.** TLS is automatic. Sane security headers are on. The admin API is loopback-only until you say otherwise. Defaults assume hostile input. You opt *out* of safety, never *in*. (See [09. Security](09-security.md) and [21. Threat Model](21-threat-model.md).)
 5. **Batteries included.** Caching, WAF, rate limiting, compression, CORS, JWT/mTLS auth, health checks, load balancing, metrics, tracing, and a dashboard are core features, not plugins to assemble. Rationale: the 95% case should require zero ecosystem archaeology.
 6. **Extremely easy to use.** Error messages point at the line and column and suggest the fix. The CLI explains what it is about to do. The dashboard makes the running state legible. Ease is measured, not asserted (time-to-first-byte for a new user is a tracked metric).
@@ -50,7 +50,7 @@ Pulsate is designed for three concentric audiences, in priority order.
 
 | Audience | Who they are | What they need from Pulsate | Primary docs |
 |---|---|---|---|
-| **The solo developer / indie team** | Ships a Rails/Node/Go/Rust app; wants HTTPS, a domain, maybe caching; has no ops team | `p8 up` and a five-line config; automatic certs; app auto-detection | [14. DX](14-developer-experience.md), [04. Config](04-configuration.md) |
+| **The solo developer / indie team** | Ships a Rails/Node/Go/Rust app; wants HTTPS, a domain, maybe caching; has no ops team | `pulsate up` and a five-line config; automatic certs; app auto-detection | [14. DX](14-developer-experience.md), [04. Config](04-configuration.md) |
 | **The platform / infra team** | Runs many services for many internal teams; cares about reload safety, blast radius, observability, policy | Multi-site config, health checks, circuit breakers, metrics, audit logs, clustering | [06. Reverse Proxy](06-reverse-proxy.md), [02. Architecture](02-architecture.md) |
 | **The enterprise** | Compliance, multi-tenancy, support contracts, air-gapped installs | RBAC, secrets backends, FIPS posture, HA/DR, commercial support | [29. Multi-Tenancy](29-multi-tenancy-and-isolation.md), [32. DR/HA](32-disaster-recovery-and-ha.md) |
 

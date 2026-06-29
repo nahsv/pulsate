@@ -23,7 +23,7 @@ scales, unchanged in shape, to a multi-site deployment.
 ## Install
 
 Every channel installs two identical binaries: **`pulsate`** and its short alias
-**`p8`**.
+**`pulsate`**.
 
 ```sh
 # Shell installer (Linux/macOS) — downloads the prebuilt release binary
@@ -63,9 +63,9 @@ are automated with [release-plz](https://release-plz.dev); see [RELEASING.md](RE
 ## Quick start
 
 ```sh
-# Validate a config, then serve it. `p8` is a shorter alias for `pulsate`.
+# Validate a config, then serve it. `pulsate` is a shorter alias for `pulsate`.
 pulsate validate examples/spa-api.flow
-p8 up examples/static.flow --listen 127.0.0.1:8080
+pulsate up examples/static.flow --listen 127.0.0.1:8080
 ```
 
 A `pulsate.flow` reads the way a request flows — match, then a pipeline, then a
@@ -105,7 +105,7 @@ site app.example.com {
   plus an embedded dashboard.
 - **Extensibility** — a capability-sandboxed WASM plugin host (Wasmtime) with a
   fuel budget and ABI versioning.
-- **Migration** — `p8 import nginx|caddy|haproxy|apache` translates an existing
+- **Migration** — `pulsate import nginx|caddy|haproxy|apache` translates an existing
   config to Flow and reports the fidelity of every mapping.
 
 ## Configuration
@@ -117,8 +117,8 @@ errors point at the line and column. TLS is automatic unless you opt out; the
 admin API is loopback-only until you say otherwise.
 
 ```sh
-p8 validate pulsate.flow      # parse + validate, with diagnostics
-p8 config dump pulsate.flow   # print the typed config model
+pulsate validate pulsate.flow      # parse + validate, with diagnostics
+pulsate config dump pulsate.flow   # print the typed config model
 ```
 
 ## Architecture

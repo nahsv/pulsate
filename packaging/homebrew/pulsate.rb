@@ -34,7 +34,7 @@ class Pulsate < Formula
   end
 
   def install
-    bin.install "pulsate", "p8"
+    bin.install "pulsate"
   end
 
   test do

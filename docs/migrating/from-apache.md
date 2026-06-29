@@ -1,6 +1,6 @@
 # Migrating from Apache httpd
 
-> **An automatic importer now exists:** `p8 import apache <httpd.conf>`. It maps
+> **An automatic importer now exists:** `pulsate import apache <httpd.conf>`. It maps
 > `<VirtualHost>` `ServerName`/`ServerAlias` → `site`, `SSLEngine`/`:443` →
 > `tls auto`, `ProxyPass` → `proxy(...)`, `DocumentRoot` → `files(...)`, and
 > `Redirect` → `redirect(...)`. Directives that don't translate 1:1 —

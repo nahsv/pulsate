@@ -18,17 +18,17 @@
 
 ## Deployment principles
 
-- **The same binary and the same config everywhere.** A laptop, a VM, a pod, and a 50-node fleet run the identical `p8` and shape of `pulsate.flow`. No special "ingress build."
+- **The same binary and the same config everywhere.** A laptop, a VM, a pod, and a 50-node fleet run the identical `pulsate` and shape of `pulsate.flow`. No special "ingress build."
 - **Stateless data plane.** Each node serves from an immutable snapshot; shared state (certs, cache L2, rate-limit counters, sticky sessions) is externalized so nodes are interchangeable and horizontally scalable.
 - **Self-sufficient single node, optional coordination.** One Pulsate is complete. Cluster mode adds coordination (shared certs/state, fleet config) without requiring an external control plane.
 - **Secure & observable by default in every target.** TLS, loopback admin, metrics, and audit logging behave the same regardless of platform.
 
 ## Bare metal
 
-- Drop the static binary on the host, write `/etc/p8/pulsate.flow`, run `p8 run` (foreground) under a supervisor, or `p8 up --detach`.
-- **Privileged ports:** bind 80/443 via `CAP_NET_BIND_SERVICE` (preferred) or start as root and **drop to an unprivileged user** after binding (`pulsate { user "p8"; group "p8" }`).
-- **Tuning:** raise file-descriptor limits, set `somaxconn`, ephemeral port range, and (for high QUIC throughput) UDP buffer sysctls — `p8 doctor` checks these and [31. Benchmarking & Tuning](31-benchmarking-and-tuning.md) documents recommended values.
-- State (certs, cache, audit) lives under a configurable data dir (`/var/lib/p8`), which should be on persistent storage ([23. Data & State Model](23-data-and-state-model.md)).
+- Drop the static binary on the host, write `/etc/pulsate/pulsate.flow`, run `pulsate run` (foreground) under a supervisor, or `pulsate up --detach`.
+- **Privileged ports:** bind 80/443 via `CAP_NET_BIND_SERVICE` (preferred) or start as root and **drop to an unprivileged user** after binding (`pulsate { user "pulsate"; group "pulsate" }`).
+- **Tuning:** raise file-descriptor limits, set `somaxconn`, ephemeral port range, and (for high QUIC throughput) UDP buffer sysctls — `pulsate doctor` checks these and [31. Benchmarking & Tuning](31-benchmarking-and-tuning.md) documents recommended values.
+- State (certs, cache, audit) lives under a configurable data dir (`/var/lib/pulsate`), which should be on persistent storage ([23. Data & State Model](23-data-and-state-model.md)).
 
 ## systemd
 
@@ -42,15 +42,15 @@ Wants=network-online.target
 
 [Service]
 Type=notify                       # Pulsate signals readiness via sd_notify
-ExecStart=/usr/bin/p8 run --config /etc/p8/pulsate.flow
-ExecReload=/usr/bin/p8 reload  # zero-downtime reload on `systemctl reload p8`
+ExecStart=/usr/bin/pulsate run --config /etc/pulsate/pulsate.flow
+ExecReload=/usr/bin/pulsate reload  # zero-downtime reload on `systemctl reload pulsate`
 AmbientCapabilities=CAP_NET_BIND_SERVICE
-User=p8
-Group=p8
+User=pulsate
+Group=pulsate
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/var/lib/p8
+ReadWritePaths=/var/lib/pulsate
 LimitNOFILE=1048576
 Restart=on-failure
 WatchdogSec=30s                   # systemd watchdog integration
@@ -66,11 +66,11 @@ WantedBy=multi-user.target
 
 - **Distroless, multi-arch images**; tiny (one static binary). Run as non-root by default; `CAP_NET_BIND_SERVICE` granted for low ports.
   ```bash
-  docker run -d --name p8 \
+  docker run -d --name pulsate \
     -p 80:80 -p 443:443 -p 443:443/udp \
-    -v $PWD/pulsate.flow:/etc/p8/pulsate.flow:ro \
-    -v pulsate-data:/var/lib/p8 \
-    ghcr.io/p8/p8:1
+    -v $PWD/pulsate.flow:/etc/pulsate/pulsate.flow:ro \
+    -v pulsate-data:/var/lib/pulsate \
+    ghcr.io/pulsate/pulsate:1
   ```
 - **HTTP/3** needs the UDP port published (`443/udp`).
 - **Config & secrets** mount read-only; data volume persists certs/cache/state. Health via `HEALTHCHECK` hitting the readiness endpoint.
@@ -81,12 +81,12 @@ Pulsate as the edge for a Compose stack, with service auto-discovery:
 
 ```yaml
 services:
-  p8:
-    image: ghcr.io/p8/p8:1
+  pulsate:
+    image: ghcr.io/pulsate/pulsate:1
     ports: ["80:80", "443:443", "443:443/udp"]
     volumes:
-      - ./pulsate.flow:/etc/p8/pulsate.flow:ro
-      - pulsate-data:/var/lib/p8
+      - ./pulsate.flow:/etc/pulsate/pulsate.flow:ro
+      - pulsate-data:/var/lib/pulsate
     depends_on: [api, web]
   api:
     build: ./api          # reachable as upstream http://api:8080
@@ -146,7 +146,7 @@ cluster {
 ## Zero-downtime upgrades
 
 - **Config:** always zero-downtime via snapshot swap.
-- **Binary, single node:** `p8 upgrade --zero-downtime` performs **socket handoff** — a new process inherits the listening sockets (SCM_RIGHTS/`SO_REUSEPORT`) and starts serving while the old process drains in-flight requests, then exits. No dropped connections.
+- **Binary, single node:** `pulsate upgrade --zero-downtime` performs **socket handoff** — a new process inherits the listening sockets (SCM_RIGHTS/`SO_REUSEPORT`) and starts serving while the old process drains in-flight requests, then exits. No dropped connections.
 - **Binary, fleet:** rolling upgrade — drain one node (readiness off → LB stops sending traffic → drain → upgrade → readiness on), repeat. PodDisruptionBudget/`maxUnavailable` controls pace on Kubernetes.
 - **Rollback:** keep the previous binary and snapshot; a failed upgrade rolls back the node and the config generation.
 

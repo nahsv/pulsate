@@ -1,6 +1,6 @@
 # 30. Migration and Import
 
-> The on-ramp from incumbents: `p8 import` tooling that converts nginx, Caddy, HAProxy, and Apache configurations into Pulsate Flow — with directive mapping tables, fidelity warnings, dry-run diffs, and round-trip validation. Lowering switching cost is a growth strategy.
+> The on-ramp from incumbents: `pulsate import` tooling that converts nginx, Caddy, HAProxy, and Apache configurations into Pulsate Flow — with directive mapping tables, fidelity warnings, dry-run diffs, and round-trip validation. Lowering switching cost is a growth strategy.
 
 **Contents**
 - [Why importers matter](#why-importers-matter)
@@ -18,7 +18,7 @@
 
 ## Why importers matter
 
-The biggest barrier to adopting a new gateway is the config a team already has. `p8 import` turns "rewrite everything" into "review a generated file," making evaluation low-risk. Importers also *teach* the Flow language by example (you see your familiar config become Flow side by side). This is a deliberate adoption lever ([01. Vision](01-vision.md)).
+The biggest barrier to adopting a new gateway is the config a team already has. `pulsate import` turns "rewrite everything" into "review a generated file," making evaluation low-risk. Importers also *teach* the Flow language by example (you see your familiar config become Flow side by side). This is a deliberate adoption lever ([01. Vision](01-vision.md)).
 
 ## How import works
 
@@ -26,15 +26,15 @@ The biggest barrier to adopting a new gateway is the config a team already has. 
 
 ```
 foreign config ─▶ [foreign parser] ─▶ foreign AST ─▶ [mapper] ─▶ Flow model
-   ─▶ [Flow renderer + p8 fmt] ─▶ pulsate.flow  +  migration-report.md
+   ─▶ [Flow renderer + pulsate fmt] ─▶ pulsate.flow  +  migration-report.md
 ```
 
 ```bash
-p8 import nginx /etc/nginx/nginx.conf -o pulsate.flow     # write
-p8 import nginx /etc/nginx/nginx.conf --diff            # preview mapping, write nothing
-p8 import caddy ./Caddyfile
-p8 import haproxy /etc/haproxy/haproxy.cfg              # frontends/backends → sites + upstreams
-p8 import apache /etc/apache2/sites-enabled/site.conf  # <VirtualHost> → site
+pulsate import nginx /etc/nginx/nginx.conf -o pulsate.flow     # write
+pulsate import nginx /etc/nginx/nginx.conf --diff            # preview mapping, write nothing
+pulsate import caddy ./Caddyfile
+pulsate import haproxy /etc/haproxy/haproxy.cfg              # frontends/backends → sites + upstreams
+pulsate import apache /etc/apache2/sites-enabled/site.conf  # <VirtualHost> → site
 ```
 
 Every import emits a **migration report**: what mapped cleanly, what needed approximation, and what couldn't be represented (with line references back to the source).
@@ -131,11 +131,11 @@ Manual.
 ## Validation & rollout workflow
 
 A safe, reviewable migration path:
-1. `p8 import <kind> <src> --diff` — review the mapping and report; no files written.
-2. `p8 import <kind> <src> -o pulsate.flow` — generate; **review the `# MIGRATION:`/`# TODO:` notes**.
-3. `p8 validate pulsate.flow` — catch anything that needs fixing (`PLS-CFG-*`).
+1. `pulsate import <kind> <src> --diff` — review the mapping and report; no files written.
+2. `pulsate import <kind> <src> -o pulsate.flow` — generate; **review the `# MIGRATION:`/`# TODO:` notes**.
+3. `pulsate validate pulsate.flow` — catch anything that needs fixing (`PLS-CFG-*`).
 4. **Shadow/parallel run:** run Pulsate alongside the old proxy on a different port; mirror or canary a slice of traffic; compare responses/metrics.
-5. **Round-trip check:** `p8 import` can optionally re-derive the intended behavior and diff against the source's observed routing for representative requests.
+5. **Round-trip check:** `pulsate import` can optionally re-derive the intended behavior and diff against the source's observed routing for representative requests.
 6. Cut over with a weighted/canary rollout ([06. Reverse Proxy](06-reverse-proxy.md)); keep the old config for rollback.
 
 ## Limitations
@@ -147,7 +147,7 @@ Honest boundaries (also stated in the report):
 - The importer **never silently drops** behavior — anything not represented is reported. The goal is a trustworthy 80–95% automatic conversion plus a clear list of the remainder.
 
 ## Cross-references
-- [13. CLI](13-cli.md) — the `p8 import` commands.
+- [13. CLI](13-cli.md) — the `pulsate import` commands.
 - [04. Configuration](04-configuration.md) & [27. Config Reference](27-config-reference.md) — the Flow targets of mapping.
 - [06. Reverse Proxy](06-reverse-proxy.md) — canary cutover.
 - [12. Plugins](12-plugins.md) — porting embedded logic to WASM.

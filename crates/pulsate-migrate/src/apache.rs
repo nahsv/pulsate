@@ -22,7 +22,7 @@ struct Vhost {
 /// Import an Apache `httpd.conf` / vhost file into Flow.
 pub fn import(text: &str) -> Import {
     let mut b = Builder::default();
-    b.line("# Imported from Apache by `p8 import apache`. Review the notes.");
+    b.line("# Imported from Apache by `pulsate import apache`. Review the notes.");
 
     let mut vhost: Option<Vhost> = None;
     for raw in text.lines() {

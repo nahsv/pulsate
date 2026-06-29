@@ -53,7 +53,7 @@ Each field is listed as `name : type = default` with scope and notes. Types are 
 | `http3` | bool | true | enable H3 on the https port (UDP) |
 | `workers` | int | 0 | 0=auto (per core); N=prefork processes |
 | `user` / `group` | string | — | drop privileges after bind |
-| `data_dir` | string | `/var/lib/p8` | durable state ([23](23-data-and-state-model.md)) |
+| `data_dir` | string | `/var/lib/pulsate` | durable state ([23](23-data-and-state-model.md)) |
 | `admin { listen }` | addr | `127.0.0.1:9180` | admin API/dashboard (loopback default) |
 | `admin { auth }` | block | required if non-loopback | tokens/oidc/mtls |
 | `runtime { worker_threads }` | int | 0 (auto) | Tokio threads |

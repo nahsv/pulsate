@@ -2,12 +2,11 @@
 FROM rust:1.86-bookworm AS build
 WORKDIR /src
 COPY . .
-RUN cargo build --release --locked --bin pulsate --bin p8
+RUN cargo build --release --locked --bin pulsate
 
 # distroless/cc carries glibc + libgcc, which `ring` (TLS) needs.
 FROM gcr.io/distroless/cc-debian12
 COPY --from=build /src/target/release/pulsate /usr/bin/pulsate
-COPY --from=build /src/target/release/p8 /usr/bin/p8
 COPY packaging/pulsate.flow /etc/pulsate/pulsate.flow
 
 # HTTP, metrics, admin.

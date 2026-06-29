@@ -8,8 +8,8 @@
 #
 # STEPS (A — static)
 #   1. npm run build            # outputs to ./build
-#   2. p8 validate examples/frameworks/sveltekit.flow
-#      sudo p8 up examples/frameworks/sveltekit.flow
+#   2. pulsate validate examples/frameworks/sveltekit.flow
+#      sudo pulsate up examples/frameworks/sveltekit.flow
 #   3. Verify deep-link refresh works (SPA fallback to index.html).
 #
 # STEPS (B — SSR): build, then `PORT=3000 node build/index.js`, and use

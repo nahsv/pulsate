@@ -71,10 +71,10 @@ Key properties:
 
 ## On-disk layout
 
-Default data dir `/var/lib/p8` (configurable; `pulsate { data_dir "..." }`):
+Default data dir `/var/lib/pulsate` (configurable; `pulsate { data_dir "..." }`):
 
 ```
-/var/lib/p8/
+/var/lib/pulsate/
 ├── state.redb                 # transactional KV: certs, acme, tickets, cache_index, meta
 ├── certs/                     # (optional) PEM mirrors for inspection (canonical copy in state.redb)
 ├── cache/
@@ -85,18 +85,18 @@ Default data dir `/var/lib/p8` (configurable; `pulsate { data_dir "..." }`):
 │   └── audit-2026-06-26.jsonl # hash-chained audit log (rotated), if file sink
 ├── plugins/                   # cached AOT-compiled plugin artifacts (+ source .wasm)
 └── run/
-    ├── p8.sock             # admin UDS (optional, alternative to TCP)
-    └── p8.pid
+    ├── pulsate.sock             # admin UDS (optional, alternative to TCP)
+    └── pulsate.pid
 ```
 
-- **Config (`pulsate.flow`)** is **not** here — it lives where the operator manages it (a repo, `/etc/p8`, a CRD). The data dir holds only runtime/durable state.
+- **Config (`pulsate.flow`)** is **not** here — it lives where the operator manages it (a repo, `/etc/pulsate`, a CRD). The data dir holds only runtime/durable state.
 - **Cache blobs** are content-addressed files (enabling dedup and `sendfile`); the index in `state.redb` maps cache keys → blobs. Disk cache has its own size cap with LRU/TinyLFU eviction and periodic compaction.
 - **Audit** can be a local rotated JSONL file or streamed to syslog/OTLP (then the local file is just a buffer).
 
 ## Encryption at rest & permissions
 
 - **Sensitive material encrypted at rest:** private keys, ACME account keys, ticket keys, and secret-derived values in `state.redb` are encrypted with a data-encryption key wrapped by the secrets backend/KMS ([09. Security](09-security.md)). Without the KMS/key, a stolen disk yields no keys.
-- **File permissions:** the data dir is `0700`, owned by the `p8` user; key material `0600`. Pulsate refuses to start (or warns loudly) on world-readable state.
+- **File permissions:** the data dir is `0700`, owned by the `pulsate` user; key material `0600`. Pulsate refuses to start (or warns loudly) on world-readable state.
 - **Secrets never persisted in plaintext** and never written to logs/audit/cache (redaction is enforced).
 - **Cache confidentiality:** responses marked `private`/authenticated are not written to a shared on-disk/redis cache unless explicitly keyed by identity; optional cache encryption for sensitive deployments.
 

@@ -10,8 +10,8 @@
 #        PORT=3000 HOSTNAME=127.0.0.1 npm run start
 #      (For `next export` static output, see sveltekit.flow's files() pattern.)
 #   2. Point DNS for app.example.com at this host.
-#   3. p8 validate examples/frameworks/nextjs.flow
-#      sudo p8 up examples/frameworks/nextjs.flow
+#   3. pulsate validate examples/frameworks/nextjs.flow
+#      sudo pulsate up examples/frameworks/nextjs.flow
 #   4. Verify:  curl -I https://app.example.com/_next/static/... → immutable cache
 # =================================================================
 

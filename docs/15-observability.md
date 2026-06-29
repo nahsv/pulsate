@@ -84,7 +84,7 @@ log { level info; format json; output stdout
 
 - Every request gets a **request ID** at [Accept]/[Decode]: if the client/upstream sent a trusted `X-Request-ID`/`traceparent`, Pulsate reuses it; otherwise it generates one (ULID-style, sortable).
 - The request ID is: added to the response (`X-Request-ID`), forwarded to the upstream, attached to every log line and span for that request, and shown in the dashboard request inspector.
-- This is the single thread that ties a user-reported "request at 14:03 failed" to its logs, its trace, and its metrics exemplar — `p8 trace <request-id>` ([13. CLI](13-cli.md)) pulls it all together.
+- This is the single thread that ties a user-reported "request at 14:03 failed" to its logs, its trace, and its metrics exemplar — `pulsate trace <request-id>` ([13. CLI](13-cli.md)) pulls it all together.
 
 ## Distributed tracing in practice
 

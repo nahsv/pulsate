@@ -47,7 +47,7 @@ The dashboard is a **pure client of the Admin API** — it can do nothing the AP
 
 ## Authentication & authorization
 
-- **Local-first:** on loopback, the dashboard can use a one-time CLI-issued token (`p8 dashboard open` prints a localhost URL with a short-lived token) — zero config to start.
+- **Local-first:** on loopback, the dashboard can use a one-time CLI-issued token (`pulsate dashboard open` prints a localhost URL with a short-lived token) — zero config to start.
 - **Exposed deployments** require explicit auth: built-in username/password (hashed, secret-stored), OIDC/SSO (delegate to your IdP), or mTLS client certs. Admin API tokens scope access.
 - **RBAC:** roles (viewer, operator, admin) map to admin-API scopes — a viewer sees metrics/logs; an operator can purge cache / reload; an admin can edit config and manage certs ([29. Multi-Tenancy](29-multi-tenancy-and-isolation.md)). All privileged actions are **audit-logged** ([09. Security](09-security.md)).
 - **Secure by default:** never auto-exposed; binding it to a public interface requires `admin { listen 0.0.0.0:... }` *and* configured auth, with a loud startup warning if auth is missing.
@@ -66,7 +66,7 @@ The dashboard is a **pure client of the Admin API** — it can do nothing the AP
 
 ## Configuration editor
 
-- **View and (optionally) edit** `pulsate.flow` with syntax highlighting for the Flow language, inline validation (the same `p8 validate` engine, surfacing `PLS-CFG-*` errors with spans), and a **diff preview** of the resulting `ConfigSnapshot` change.
+- **View and (optionally) edit** `pulsate.flow` with syntax highlighting for the Flow language, inline validation (the same `pulsate validate` engine, surfacing `PLS-CFG-*` errors with spans), and a **diff preview** of the resulting `ConfigSnapshot` change.
 - **Safe apply:** editing goes through validate → diff → confirm → atomic reload, with the auto-rollback guard window ([02. Architecture](02-architecture.md#hot-reload-architecture)). You see exactly what will change before it does.
 - **Version history:** every applied change is recorded (actor, diff, hash) in the audit log; you can view past versions and one-click **roll back**.
 - **GitOps-friendly:** in environments where config is managed in Git/CRD, the editor is read-only and points you to the source of truth (no split-brain).
@@ -82,7 +82,7 @@ The dashboard is a **pure client of the Admin API** — it can do nothing the AP
 The standout developer-experience feature: a **live, opt-in tap** on real requests for debugging.
 - Start a tap with a filter (host/path/status/header); matching requests stream to the inspector showing the **full [request lifecycle](02-architecture.md#request-lifecycle)**: which site/route matched, each middleware step and its decision (e.g., "rate_limit: allowed", "jwt: valid sub=…", "cache: MISS"), the upstream chosen, per-stage timings, and the final response.
 - **Replay/curl export:** turn a captured request into a `curl` command or replay it (in dev mode) to reproduce a bug.
-- **Privacy-aware:** sensitive headers/bodies are redacted per policy; taps are bounded, time-limited, and audit-logged. This is the GUI counterpart to `p8 inspect` ([13. CLI](13-cli.md)).
+- **Privacy-aware:** sensitive headers/bodies are redacted per policy; taps are bounded, time-limited, and audit-logged. This is the GUI counterpart to `pulsate inspect` ([13. CLI](13-cli.md)).
 
 ## Cache statistics
 
@@ -95,5 +95,5 @@ The standout developer-experience feature: a **live, opt-in tap** on real reques
 - [22. Admin API](22-admin-api.md) — the API the dashboard consumes; the real contract.
 - [15. Observability](15-observability.md) & [26. Metrics Catalog](26-metrics-and-slo-catalog.md) — metrics behind the views.
 - [09. Security](09-security.md) — auth, RBAC, audit logging, secret redaction.
-- [13. CLI](13-cli.md) — `p8 inspect`, `p8 dashboard`, the CLI equivalents.
+- [13. CLI](13-cli.md) — `pulsate inspect`, `pulsate dashboard`, the CLI equivalents.
 - [08. Cache](08-cache.md) — cache stats and purge semantics.

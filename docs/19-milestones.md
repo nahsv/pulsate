@@ -55,7 +55,7 @@ Critical path runs P0→P1→P2→P3; P4/P5 parallelize once the proxy path exis
 ## Phase 1 — Config language & snapshot core
 
 - **Objectives:** implement Pulsate Flow end-to-end and the snapshot/reload machinery — the backbone everything configures against.
-- **Deliverables:** `pulsate-flow` lexer/parser/AST with span-accurate diagnostics; `pulsate-config` typed model, includes/env/secret resolution, validation, `ConfigSnapshot` build + `arc-swap` publish + reload/rollback; `p8 validate`/`fmt`/`config dump|diff|explain`.
+- **Deliverables:** `pulsate-flow` lexer/parser/AST with span-accurate diagnostics; `pulsate-config` typed model, includes/env/secret resolution, validation, `ConfigSnapshot` build + `arc-swap` publish + reload/rollback; `pulsate validate`/`fmt`/`config dump|diff|explain`.
 - **LOC:** ~8k. **Duration:** ~6–8 weeks.
 - **Testing:** parser unit + **property** (round-trip) + **fuzz** tests; golden-file validation tests; reload-under-concurrency tests; diagnostic snapshot tests.
 - **Risks:** config UX/error-quality is make-or-break (mitigate: invest early in diagnostics, dogfood); over-scoping the language (mitigate: stabilize `flow_version "1"` minimal surface first).
@@ -65,7 +65,7 @@ Critical path runs P0→P1→P2→P3; P4/P5 parallelize once the proxy path exis
 ## Phase 2 — HTTP/1.1 + TLS data plane
 
 - **Objectives:** terminate HTTP/1.1 over TLS and serve static files — the first end-to-end request path through the [lifecycle](02-architecture.md#request-lifecycle).
-- **Deliverables:** `pulsate-net` listeners (+`SO_REUSEPORT`, limits); `pulsate-tls` rustls termination, SNI, ALPN, manual certs, mTLS; `pulsate-http` H1 via hyper; `pulsate-router` matchers + precedence; a `files()` handler; `p8 up`/`run`/`down` lifecycle + graceful shutdown.
+- **Deliverables:** `pulsate-net` listeners (+`SO_REUSEPORT`, limits); `pulsate-tls` rustls termination, SNI, ALPN, manual certs, mTLS; `pulsate-http` H1 via hyper; `pulsate-router` matchers + precedence; a `files()` handler; `pulsate up`/`run`/`down` lifecycle + graceful shutdown.
 - **LOC:** ~10k. **Duration:** ~8–10 weeks.
 - **Testing:** integration tests via `pulsate-test` loopback harness; TLS interop matrix; **fuzz** the H1 decoder; request-smuggling/ambiguous-framing rejection tests; graceful-shutdown drain tests; routing precedence tests.
 - **Risks:** HTTP correctness edge cases (mitigate: conformance suite, fuzzing); timeout/backpressure bugs (mitigate: explicit timeout tests).
@@ -117,7 +117,7 @@ Critical path runs P0→P1→P2→P3; P4/P5 parallelize once the proxy path exis
 ## Phase 7 — HTTP/3 & plugins
 
 - **Objectives:** modern transport (H3/QUIC) and the extensibility story (WASM plugins + SDK).
-- **Deliverables:** `pulsate-http3` QUIC/h3 (quinn), Alt-Svc, 0-RTT policy, UDP perf (GSO/GRO); `pulsate-plugin` Wasmtime host (component model, WIT host API, capability sandbox, fuel/epoch, pooling, signing/verify); `pulsate-sdk` Rust SDK + templates; `p8 plugin` CLI.
+- **Deliverables:** `pulsate-http3` QUIC/h3 (quinn), Alt-Svc, 0-RTT policy, UDP perf (GSO/GRO); `pulsate-plugin` Wasmtime host (component model, WIT host API, capability sandbox, fuel/epoch, pooling, signing/verify); `pulsate-sdk` Rust SDK + templates; `pulsate plugin` CLI.
 - **LOC:** ~14k. **Duration:** ~12–14 weeks.
 - **Testing:** **h3spec**, QUIC interop, 0-RTT replay tests; plugin sandbox-escape attempts, fuel/epoch limit tests, ABI-version compat tests, signing/verify tests; plugin perf benchmarks.
 - **Risks:** QUIC/UDP perf and portability (mitigate: feature-gate, fallbacks); plugin ABI stability commitment (mitigate: version it conservatively, deprecation policy — [12. Plugins](12-plugins.md)); sandbox correctness (mitigate: adversarial tests, capability-deny-by-default).

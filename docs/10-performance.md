@@ -63,7 +63,7 @@ Credible, reproducible, and apples-to-apples — to avoid the "benchmarketing" t
 
 ## Profiling
 
-- **Continuous & on-demand:** `pprof`-style CPU/heap profiling exposed via the admin API (`/v1/debug/pprof`, loopback-gated) so operators can profile a live process; flamegraphs via `p8 bench --profile`.
+- **Continuous & on-demand:** `pprof`-style CPU/heap profiling exposed via the admin API (`/v1/debug/pprof`, loopback-gated) so operators can profile a live process; flamegraphs via `pulsate bench --profile`.
 - **Tooling:** `cargo flamegraph`, `perf`, `tokio-console` (task stalls, busy loops), `heaptrack`/`dhat` (allocations), and `bytehound` for leak hunts in CI soak.
 - **Tracing for latency:** per-stage timing in the [request lifecycle](02-architecture.md#request-lifecycle) is recorded so a slow request can be attributed to a specific stage/middleware (the basis for AI-assisted diagnostics in [20. Future](20-future.md)).
 - **Benchmark crates:** `criterion` microbenchmarks for parsers, matchers, LB selection, cache math — guarding the inner loops.

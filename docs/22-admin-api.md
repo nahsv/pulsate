@@ -29,7 +29,7 @@
 
 ## Authentication & authorization
 
-- **AuthN:** bearer tokens (issued/managed via config or the API), mTLS client certs, or OIDC/SSO. On loopback, a short-lived local token (`p8 dashboard open`) bootstraps access.
+- **AuthN:** bearer tokens (issued/managed via config or the API), mTLS client certs, or OIDC/SSO. On loopback, a short-lived local token (`pulsate dashboard open`) bootstraps access.
 - **AuthZ (RBAC):** every endpoint requires a scope; tokens carry roles mapping to scopes:
 
 | Role | Scopes (examples) |
@@ -148,7 +148,7 @@ These power the dashboard's live views without polling.
 
 `grpcurl` example:
 ```bash
-grpcurl -H "authorization: Bearer $TOKEN" 127.0.0.1:9180 p8.v1.Admin/GetStatus
+grpcurl -H "authorization: Bearer $TOKEN" 127.0.0.1:9180 pulsate.v1.Admin/GetStatus
 ```
 
 ## Cross-references

@@ -54,7 +54,7 @@ Key derived metrics:
 - **`wrk2`** — constant-rate HTTP/1.1/2 with correct latency under coordinated omission.
 - **`h2load`** — HTTP/2 and HTTP/3 throughput/latency.
 - **`vegeta`** — scripted, constant-rate, good for mixed profiles and reports.
-- **`p8 bench`** — the built-in generator (HdrHistogram, CO-aware) for quick local runs ([13. CLI](13-cli.md)).
+- **`pulsate bench`** — the built-in generator (HdrHistogram, CO-aware) for quick local runs ([13. CLI](13-cli.md)).
 - **Server-side:** per-stage metrics ([26. Metrics Catalog](26-metrics-and-slo-catalog.md)), `perf`/flamegraphs, `tokio-console`, allocation profiling — to attribute results to code, not guess.
 Warm-up periods are discarded; runs are repeated and reported with variance; outlier runs are investigated, not dropped.
 
@@ -74,7 +74,7 @@ To compare against nginx, Caddy, Envoy, and Traefik fairly:
 
 ## Operator tuning guide
 
-Most users need none of this (defaults are good); this is for squeezing a busy node. `p8 doctor` checks many of these and warns.
+Most users need none of this (defaults are good); this is for squeezing a busy node. `pulsate doctor` checks many of these and warns.
 
 **OS / kernel (Linux):**
 | Setting | Guidance |
@@ -111,4 +111,4 @@ Most users need none of this (defaults are good); this is for squeezing a busy n
 - [28. Testing & Conformance](28-testing-and-conformance.md) — load/soak/chaos as release gates.
 - [26. Metrics Catalog](26-metrics-and-slo-catalog.md) — server-side measurement signals.
 - [16. Deployment](16-deployment.md) — where these tunables apply in production.
-- [13. CLI](13-cli.md) — `p8 bench`, `p8 doctor`.
+- [13. CLI](13-cli.md) — `pulsate bench`, `pulsate doctor`.

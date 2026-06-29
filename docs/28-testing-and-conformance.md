@@ -26,7 +26,7 @@ A proxy fails in production in ways unit tests miss: adversarial inputs, protoco
 
 ```
                  ┌───────────────┐  few, slow, high-fidelity
-                 │  E2E / chaos  │  (p8 up scenarios, kill upstreams, K8s)
+                 │  E2E / chaos  │  (pulsate up scenarios, kill upstreams, K8s)
               ┌──┴───────────────┴──┐
               │ conformance / soak  │ (h2spec/h3spec/RFC-9111, multi-hour)
            ┌──┴─────────────────────┴──┐
@@ -61,7 +61,7 @@ Corpora are seeded from real traffic captures and grown in CI; crashes auto-file
 ## Golden & snapshot tests
 
 - **Config diagnostics:** a corpus of invalid `.flow` files with expected `PLS-CFG-*` output (code + span + hint) — locks down error-message quality ([04. Configuration](04-configuration.md)).
-- **Effective config:** golden `p8 config dump --effective` outputs for representative inputs.
+- **Effective config:** golden `pulsate config dump --effective` outputs for representative inputs.
 - **Routing tables:** golden compiled-route dumps assert precedence didn't regress.
 - **Generated docs/specs:** OpenAPI, config schema, metrics/error catalogs are snapshot-tested so docs match the binary ([17. Documentation](17-documentation.md)).
 

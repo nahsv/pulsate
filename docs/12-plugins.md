@@ -67,8 +67,8 @@ One plugin may export several (e.g., a middleware + a matcher) sharing config.
 The boundary is defined in **WIT** (WASM Interface Types) so it is language-neutral and strongly typed. Illustrative WIT (design sketch, not final):
 
 ```wit
-// p8:plugin world (versioned) — design sketch
-package p8:plugin@1.0.0;
+// pulsate:plugin world (versioned) — design sketch
+package pulsate:plugin@1.0.0;
 
 interface http {
   record request  { method: string, path: string, headers: list<tuple<string,string>>, ... }
@@ -118,7 +118,7 @@ This makes third-party code a *bounded* risk — central to the [21. Threat Mode
 
 ## Versioning & API stability
 
-- The **host ABI is versioned independently** of the Pulsate binary via the WIT *world version* (`p8:plugin@1.x`). A binary supports a **range** of ABI versions; a plugin declares the world it targets.
+- The **host ABI is versioned independently** of the Pulsate binary via the WIT *world version* (`pulsate:plugin@1.x`). A binary supports a **range** of ABI versions; a plugin declares the world it targets.
 - **Stability guarantee:** within an ABI major, plugins keep working across Pulsate upgrades. Breaking the ABI is a major-version event with a deprecation window and a compatibility shim where feasible.
 - **Capability/permission additions** are backward-compatible (new optional imports); removals are breaking and scheduled.
 - This independent versioning (binary vs config `flow_version` vs plugin ABI — [03. Repository](03-repository.md#versioning)) means upgrading one rarely forces upgrading the others.
@@ -128,7 +128,7 @@ This makes third-party code a *bounded* risk — central to the [21. Threat Mode
 `pulsate-sdk` makes writing plugins pleasant:
 - **Rust-first:** ergonomic wrappers over the raw WIT bindings — implement a `Middleware`-shaped trait, annotate with a macro, `cargo build --target wasm32-wasip2`, done. Hides the ABI boilerplate.
 - **Other languages:** because the contract is WIT/Component Model, bindings can be generated for any language with WASM component support (Go via TinyGo, JS/TS via jco, Python, etc.); the SDK ships a starter template per supported language.
-- **Local dev loop:** `p8 plugin new <name>` scaffolds a project; `p8 plugin test` runs it against a local harness with mocked requests; `p8 plugin run` hot-loads it into a dev server ([13. CLI](13-cli.md)).
+- **Local dev loop:** `pulsate plugin new <name>` scaffolds a project; `pulsate plugin test` runs it against a local harness with mocked requests; `pulsate plugin run` hot-loads it into a dev server ([13. CLI](13-cli.md)).
 - **Docs & examples:** a cookbook of real plugins (geoblock, header transform, custom auth, A/B flagger) — see [17. Documentation](17-documentation.md).
 
 ## Distribution & marketplace
@@ -142,4 +142,4 @@ This makes third-party code a *bounded* risk — central to the [21. Threat Mode
 - [07. Middleware](07-middleware.md) — how plugins plug into the pipeline.
 - [21. Threat Model](21-threat-model.md) — plugin/supply-chain threats and the sandbox boundary.
 - [33. Release Engineering & Supply Chain](33-release-engineering-and-supply-chain.md) — signing/provenance.
-- [13. CLI](13-cli.md) — `p8 plugin` developer commands.
+- [13. CLI](13-cli.md) — `pulsate plugin` developer commands.

@@ -1,4 +1,4 @@
-# Static site + health endpoint + redirect, served by `p8 up`.
+# Static site + health endpoint + redirect, served by `pulsate up`.
 site localhost {
   route = /healthz ~> respond(status=204)
   route = /old     ~> redirect(to="/", status=308)

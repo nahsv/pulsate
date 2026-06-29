@@ -21,7 +21,7 @@ fn router() -> Arc<Router> {
                 method: None,
                 handler: Handler::Respond {
                     status: 200,
-                    body: "hello, p8".into(),
+                    body: "hello, pulsate".into(),
                 },
             },
             Route {
@@ -75,7 +75,7 @@ async fn serves_respond_and_redirect_and_404() {
     )
     .await;
     assert!(resp.starts_with("HTTP/1.1 200"), "got: {resp}");
-    assert!(resp.contains("hello, p8"), "got: {resp}");
+    assert!(resp.contains("hello, pulsate"), "got: {resp}");
 
     // 308 redirect with Location.
     let resp = raw_request(

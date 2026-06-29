@@ -14,7 +14,7 @@ pub fn import(text: &str) -> Import {
     let tokens = tokenize(text);
     let (nodes, _) = parse_block(&tokens, 0);
     let mut b = Builder::default();
-    b.line("# Imported from nginx by `p8 import nginx`. Review the notes.");
+    b.line("# Imported from nginx by `pulsate import nginx`. Review the notes.");
     map(&nodes, &mut b);
     b.finish()
 }

@@ -9,7 +9,7 @@ permissions:
   packages: write
 
 jobs:
-  # Cross-platform binaries (pulsate + p8), archived and attached to the release.
+  # Cross-platform binaries (pulsate), archived and attached to the release.
   binaries:
     strategy:
       fail-fast: false
@@ -28,7 +28,7 @@ jobs:
           targets: ${{ matrix.target }}
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
-          bin: pulsate,p8
+          bin: pulsate
           target: ${{ matrix.target }}
           archive: pulsate-$tag-$target
           checksum: sha256
@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo build --release --locked --bin pulsate --bin p8
+      - run: cargo build --release --locked --bin pulsate
       - run: cargo install cargo-deb cargo-generate-rpm
       - run: cargo deb -p pulsate --no-build
       - run: cargo generate-rpm -p crates/pulsate

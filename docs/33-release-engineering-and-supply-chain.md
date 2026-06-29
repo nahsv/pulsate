@@ -67,8 +67,8 @@ SemVer for the binary/public crates; independent `flow_version` and plugin-ABI v
 
 ## Update verification
 
-- **`p8 upgrade`** ([13. CLI](13-cli.md)) fetches the target release, **verifies the cosign signature and SLSA provenance and the SBOM** against the expected identity *before* swapping the binary, and supports zero-downtime handoff. A failed verification aborts the upgrade.
-- **`p8 version --json`** reports the build's commit, provenance reference, and supported `flow_version`/plugin-ABI ranges so fleets can audit what's running.
+- **`pulsate upgrade`** ([13. CLI](13-cli.md)) fetches the target release, **verifies the cosign signature and SLSA provenance and the SBOM** against the expected identity *before* swapping the binary, and supports zero-downtime handoff. A failed verification aborts the upgrade.
+- **`pulsate version --json`** reports the build's commit, provenance reference, and supported `flow_version`/plugin-ABI ranges so fleets can audit what's running.
 - **Rollback** keeps the prior verified binary for instant revert.
 
 ## Plugin supply chain
@@ -84,4 +84,4 @@ Plugins are third-party code, so they get supply-chain controls too ([12. Plugin
 - [21. Threat Model](21-threat-model.md) — supply-chain threats this mitigates.
 - [18. Open Source](18-open-source.md) — security policy & coordinated disclosure.
 - [12. Plugins](12-plugins.md) — plugin signing/capability model.
-- [13. CLI](13-cli.md) — `p8 upgrade`/`version` verification.
+- [13. CLI](13-cli.md) — `pulsate upgrade`/`version` verification.

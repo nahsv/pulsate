@@ -9,8 +9,8 @@
 #   2. Build front-end assets:  npm run build  (Vite -> public/build)
 #   3. In AppServiceProvider boot(): if(app()->environment('production')) URL::forceScheme('https');
 #      Set TrustProxies to trust the loopback.
-#   4. p8 validate examples/frameworks/laravel.flow
-#      sudo p8 up examples/frameworks/laravel.flow
+#   4. pulsate validate examples/frameworks/laravel.flow
+#      sudo pulsate up examples/frameworks/laravel.flow
 #   5. Verify:  curl -I https://example.com  → 200, http/2, HSTS
 # =================================================================
 

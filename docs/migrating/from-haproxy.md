@@ -3,7 +3,7 @@
 HAProxy's frontend/backend/ACL model maps to Flow's site/upstream/route; the
 load-balancing knobs translate directly.
 
-> **An automatic importer now exists:** `p8 import haproxy <haproxy.cfg>`. It maps
+> **An automatic importer now exists:** `pulsate import haproxy <haproxy.cfg>`. It maps
 > `backend` server pools → `upstream { target ... }`, `frontend`/`listen` binds →
 > `site`, `bind ... ssl` → `tls auto`, path-based `acl` + `use_backend` → path
 > routes, and `default_backend` → a catch-all route. Constructs without a clean

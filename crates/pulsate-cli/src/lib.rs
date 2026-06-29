@@ -1,4 +1,4 @@
-//! `pulsate-cli` — implementations of the `p8` subcommands.
+//! `pulsate-cli` — implementations of the `pulsate` subcommands.
 //!
 //! Command logic lives here rather than in the binary, which keeps the binary
 //! thin and the commands unit-testable (`docs/03-repository.md`).
@@ -55,7 +55,7 @@ impl Outcome {
     }
 }
 
-/// `p8 validate <path>` — parse and validate a config without starting.
+/// `pulsate validate <path>` — parse and validate a config without starting.
 ///
 /// Renders every diagnostic against the source with its span, and returns exit
 /// code 2 if any error is found (0 if the config is valid, warnings aside).
@@ -107,7 +107,7 @@ pub fn validate_text(name: &str, text: &str) -> Outcome {
     }
 }
 
-/// `p8 import <nginx|caddy|haproxy|apache> <path>` — translate a foreign config to Flow.
+/// `pulsate import <nginx|caddy|haproxy|apache> <path>` — translate a foreign config to Flow.
 #[must_use]
 pub fn import_config(format: &str, path: &Path) -> Outcome {
     let Some(source) = pulsate_migrate::Source::parse(format) else {
@@ -146,7 +146,7 @@ pub fn import_config(format: &str, path: &Path) -> Outcome {
     Outcome::ok(out)
 }
 
-/// `p8 plugin run <path> <input>` — load a WASM plugin and call `eval`.
+/// `pulsate plugin run <path> <input>` — load a WASM plugin and call `eval`.
 #[must_use]
 pub fn plugin_run(path: &Path, input: i32) -> Outcome {
     let name = path.display().to_string();
@@ -176,7 +176,7 @@ pub fn plugin_run(path: &Path, input: i32) -> Outcome {
     }
 }
 
-/// `p8 config dump <path>` — validate, then print the typed config model.
+/// `pulsate config dump <path>` — validate, then print the typed config model.
 #[must_use]
 pub fn config_dump(path: &Path) -> Outcome {
     let name = path.display().to_string();

@@ -175,7 +175,7 @@ fn apply_forwarded(
         HeaderName::from_static("x-forwarded-proto"),
         HeaderValue::from_static("http"),
     );
-    out.insert(http::header::VIA, HeaderValue::from_static("1.1 p8"));
+    out.insert(http::header::VIA, HeaderValue::from_static("1.1 pulsate"));
 }
 
 /// Collect the upstream response into a normalized [`Response`], dropping
@@ -230,6 +230,6 @@ mod tests {
             out.get("x-forwarded-for").unwrap(),
             "203.0.113.7, 198.51.100.2"
         );
-        assert_eq!(out.get("via").unwrap(), "1.1 p8");
+        assert_eq!(out.get("via").unwrap(), "1.1 pulsate");
     }
 }

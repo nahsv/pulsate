@@ -8,8 +8,8 @@
 #        uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 4
 #      Add ProxyHeadersMiddleware / --proxy-headers so request.url is https.
 #   2. Point DNS for api.example.com at this host.
-#   3. p8 validate examples/frameworks/fastapi.flow
-#      sudo p8 up examples/frameworks/fastapi.flow
+#   3. pulsate validate examples/frameworks/fastapi.flow
+#      sudo pulsate up examples/frameworks/fastapi.flow
 #   4. Verify docs:  open https://api.example.com/docs
 # =================================================================
 

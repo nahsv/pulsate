@@ -16,9 +16,8 @@ categories = [
     "command-line-utilities",
 ]
 
-# A shared `run()` lives in src/lib.rs. The primary binary `pulsate`
-# (src/main.rs) and its short alias `p8` (src/bin/p8.rs) are thin wrappers,
-# discovered automatically.
+# A shared `run()` lives in src/lib.rs. The binary `pulsate` (src/main.rs) is a
+# thin wrapper, discovered automatically.
 
 [dependencies]
 pulsate-core = { path = "../pulsate-core", version = "0.2.0" }
@@ -43,7 +42,6 @@ WASM plugin host — in a single static binary configured by one file.\
 """
 assets = [
     ["target/release/pulsate", "usr/bin/", "755"],
-    ["target/release/p8", "usr/bin/", "755"],
     ["packaging/pulsate.flow", "etc/pulsate/pulsate.flow", "644"],
     ["packaging/systemd/pulsate.service", "lib/systemd/system/pulsate.service", "644"],
     ["README.md", "usr/share/doc/pulsate/README.md", "644"],
@@ -54,7 +52,6 @@ conf-files = ["/etc/pulsate/pulsate.flow"]
 [package.metadata.generate-rpm]
 assets = [
     { source = "target/release/pulsate", dest = "/usr/bin/pulsate", mode = "755" },
-    { source = "target/release/p8", dest = "/usr/bin/p8", mode = "755" },
     { source = "packaging/pulsate.flow", dest = "/etc/pulsate/pulsate.flow", mode = "644", config = true },
     { source = "packaging/systemd/pulsate.service", dest = "/lib/systemd/system/pulsate.service", mode = "644" },
     { source = "README.md", dest = "/usr/share/doc/pulsate/README.md", mode = "644", doc = true },

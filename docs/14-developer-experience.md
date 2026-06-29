@@ -29,13 +29,13 @@ One step, many channels, no dependencies (one static binary):
 curl -fsSL https://squaretick.dev/pulsate/install.sh | sh
 
 # Package managers
-brew install p8                      # macOS / Linuxbrew
-apt install p8  /  dnf install p8 # Debian/RHEL (signed repos)
-scoop install p8                     # Windows
-cargo binstall p8                    # Rust users
+brew install pulsate                      # macOS / Linuxbrew
+apt install pulsate  /  dnf install pulsate # Debian/RHEL (signed repos)
+scoop install pulsate                     # Windows
+cargo binstall pulsate                    # Rust users
 
 # Container
-docker run -p 80:80 -p 443:443 ghcr.io/p8/p8:latest
+docker run -p 80:80 -p 443:443 ghcr.io/pulsate/pulsate:latest
 
 # Direct download (static binary + checksum + signature + SBOM)
 ```
@@ -44,10 +44,10 @@ Every artifact is signed (Sigstore/cosign) and ships an SBOM; the installer veri
 
 ## Project initialization
 
-`p8 init` bootstraps a config by **looking at your project**, not by asking twenty questions:
+`pulsate init` bootstraps a config by **looking at your project**, not by asking twenty questions:
 
 ```bash
-$ cd my-app && p8 init
+$ cd my-app && pulsate init
 Detected: Rails app (Procfile, config.ru) on port 3000
 Detected: Postgres (skipped — not a web service)
 Domain? [my-app.localhost] app.example.com
@@ -57,11 +57,11 @@ Wrote pulsate.flow:
     tls auto
     route /* ~> proxy(http://localhost:3000)
   }
-Run it:  p8 up --watch
+Run it:  pulsate up --watch
 ```
 
 - Generates a minimal, idiomatic `pulsate.flow` tuned to what it found.
-- `p8 init --template <api|spa|fullstack|microservices>` for common shapes.
+- `pulsate init --template <api|spa|fullstack|microservices>` for common shapes.
 - Idempotent and safe: never overwrites an existing config without `--force` (and shows a diff).
 
 ## Automatic application detection
@@ -95,14 +95,14 @@ Each recipe yields a few lines of Flow and turns on the right batteries (cache f
 
 ## Docker support
 
-- **Slim, distroless images** (`ghcr.io/p8/p8`), multi-arch (amd64/arm64), tiny because it's one static binary.
+- **Slim, distroless images** (`ghcr.io/pulsate/pulsate`), multi-arch (amd64/arm64), tiny because it's one static binary.
 - **Compose-native:** Pulsate detects sibling services in `compose.yaml` and can generate routes for them (service name → upstream). A typical edge service:
   ```yaml
   services:
-    p8:
-      image: ghcr.io/p8/p8
+    pulsate:
+      image: ghcr.io/pulsate/pulsate
       ports: ["80:80", "443:443"]
-      volumes: ["./pulsate.flow:/etc/p8/pulsate.flow:ro"]
+      volumes: ["./pulsate.flow:/etc/pulsate/pulsate.flow:ro"]
     api: { build: ./api }     # auto-discoverable as upstream http://api:8080
   ```
 - **Labels (optional):** for teams who like Traefik-style labels, Pulsate can read container labels as a *config source* — but the file remains canonical (no label sprawl required). See [16. Deployment](16-deployment.md).
@@ -119,19 +119,19 @@ Pulsate is a credible ingress/gateway without a separate control plane:
 
 ## Development mode
 
-`p8 up --watch` (or `p8 dev`) optimizes for the inner loop:
+`pulsate up --watch` (or `pulsate dev`) optimizes for the inner loop:
 - **Hot config reload** on save (sub-second, zero dropped connections).
 - **Local HTTPS that works:** automatically provisions a locally-trusted certificate (an internal dev CA installed into the system/browser trust store, like mkcert) for `*.localhost` and custom dev domains — real HTTPS in dev without ACME or warnings.
 - **Helpful errors in the browser:** in dev, upstream-down/5xx responses show a friendly diagnostic page (which route matched, why it failed) instead of a bare 502.
-- **Live request inspector** in the terminal (`p8 inspect`) and dashboard, on by default in dev.
+- **Live request inspector** in the terminal (`pulsate inspect`) and dashboard, on by default in dev.
 - **Auto-proxy:** detects your app's dev server and proxies it; survives the app restarting (connection ret/breaker tuned lenient in dev).
 
 ## Debug mode
 
 For diagnosing the gateway itself:
 - `--debug` raises log verbosity, annotates responses with `X-Pulsate-*` debug headers (matched route, cache result, upstream, timings) — gated to dev/trusted networks.
-- `p8 doctor` checks the environment (fds, ports, DNS, kernel features, permissions) and suggests fixes ([13. CLI](13-cli.md)).
-- `p8 config explain <host> <path>` answers "why did this request go there?" deterministically.
+- `pulsate doctor` checks the environment (fds, ports, DNS, kernel features, permissions) and suggests fixes ([13. CLI](13-cli.md)).
+- `pulsate config explain <host> <path>` answers "why did this request go there?" deterministically.
 - Profiling endpoints (`/v1/debug/pprof`, loopback) and `tokio-console` support for runtime stalls ([10. Performance](10-performance.md)).
 - Verbose ACME/TLS tracing to debug certificate issues, with the staging-CA shortcut to avoid rate limits.
 

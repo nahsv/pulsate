@@ -21,12 +21,12 @@
 Pulsate is a single Cargo **workspace** with ~24 member crates plus tooling. A workspace (not one giant crate) is chosen so that: compilation parallelizes and caches per crate; the data plane can be embedded as a dependency without the control plane; the public API surface (`pulsate-core`, `pulsate-sdk`) is physically separated from internals; and crate boundaries enforce the architecture's layering (a `pulsate-http` that cannot reach into `pulsate-control` because it does not depend on it).
 
 ```
-p8/
+pulsate/
 ├── Cargo.toml                # [workspace] members, shared deps via workspace.dependencies
 ├── rust-toolchain.toml       # pinned toolchain channel
 ├── deny.toml                 # cargo-deny: licenses, advisories, bans
 ├── crates/
-│   ├── p8/                # the binary (bin target `p8`)
+│   ├── pulsate/                # the binary (bin target `pulsate`)
 │   ├── pulsate-core/           # shared types, traits, error taxonomy, RequestCtx
 │   ├── pulsate-rt/             # async runtime abstraction (Tokio backend)
 │   ├── pulsate-util/           # buffers, time, small shared helpers
@@ -65,7 +65,7 @@ Shared dependencies are declared once in `[workspace.dependencies]` and inherite
 
 | Crate | Layer | Purpose | Key deps |
 |---|---|---|---|
-| `p8` | bin | Process entry; parses CLI, wires control+data plane, owns the supervisor | clap, all below |
+| `pulsate` | bin | Process entry; parses CLI, wires control+data plane, owns the supervisor | clap, all below |
 | `pulsate-core` | shared | The vocabulary of the system: `RequestCtx`, `Request`/`Response`, `PulsateError` taxonomy, traits (`Middleware`, `Handler`, `Matcher`, `Upstream`, `CacheStore`, `SecretsBackend`, `CertStore`, `MetricsSink`), `ConfigSnapshot` type | bytes, http |
 | `pulsate-rt` | shared | Runtime abstraction (`spawn`, timers, TCP/UDP, `spawn_blocking`); Tokio adapter; seam for future io_uring backend | tokio |
 | `pulsate-util` | shared | Buffer pools, duration/size parsing, small lock-free helpers | bytes |
@@ -98,7 +98,7 @@ Shared dependencies are declared once in `[workspace.dependencies]` and inherite
 Arrows mean "depends on." The graph is a DAG with `pulsate-core` at the root and the binary at the top. The data plane never depends on the control plane.
 
 ```
-                                   p8 (bin)
+                                   pulsate (bin)
                                       │
         ┌──────────────┬─────────────┼───────────────┬───────────────┐
         ▼              ▼             ▼               ▼               ▼
@@ -139,7 +139,7 @@ Layering rules enforced by `cargo-deny` and an `xtask` lint:
 
 ## Naming conventions
 
-- **Crates:** `pulsate-<area>`, lower-kebab. **Binary:** `p8`.
+- **Crates:** `pulsate-<area>`, lower-kebab. **Binary:** `pulsate`.
 - **Types:** `CamelCase`; traits are nouns or capabilities (`Middleware`, `CacheStore`); errors end in `Error`; config models end in `Config` (`RouteConfig`).
 - **Functions/vars:** `snake_case`; constructors `new`/`with_*`/`from_*`; builders return `Self`.
 - **Config keywords** (Flow): lower_snake, verbs for actions (`proxy`, `redirect`), nouns for blocks (`site`, `upstream`), consistent units (`30s`, `10MB`).
@@ -160,7 +160,7 @@ A test pyramid mapped to crates (full detail in [28. Testing & Conformance](28-t
 | Conformance | h2spec, h3spec, HTTP semantics, TLS interop, ACME staging | dedicated suite | nightly + pre-release |
 | Load/soak | Throughput, latency, memory under sustained load and reloads | `xtask bench` + CI perf job | nightly, release |
 | Chaos | Kill upstreams, drop packets, reload under load, fill disk | scripted scenarios | pre-release |
-| E2E | `p8 up` real scenarios (auto-TLS via Pebble, dashboard) | `examples/` driven | pre-release |
+| E2E | `pulsate up` real scenarios (auto-TLS via Pebble, dashboard) | `examples/` driven | pre-release |
 
 Targets: ≥85% line coverage on core/data-plane crates; 100% of error codes exercised; zero known-correctness regressions gate a release.
 

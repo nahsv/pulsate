@@ -39,8 +39,8 @@ A named cache picks one store; routes reference it:
 
 ```
 cache hot   { store memory { max 512MB; shards 16 } }                 # fastest, per-node
-cache big   { store disk   { path "/var/cache/p8"; max 50GB } }    # large, survives restart
-cache shared{ store redis  { url secret://redis_url; prefix "p8:" } } # cross-node coherence
+cache big   { store disk   { path "/var/cache/pulsate"; max 50GB } }    # large, survives restart
+cache shared{ store redis  { url secret://redis_url; prefix "pulsate:" } } # cross-node coherence
 ```
 
 | Store | Latency | Capacity | Scope | Survives restart |
@@ -103,7 +103,7 @@ cache c { default_ttl 5m; stale_while_revalidate 30s; stale_if_error 5m }
 
 - **Async revalidation** for SWR runs on a background task (off the request path), coalesced so concurrent stale hits trigger exactly one origin revalidation (**request collapsing / single-flight**) rather than a thundering herd.
 - **Proactive refresh** (optional): hot keys nearing expiry are refreshed ahead of time based on access frequency, so popular content is essentially always fresh in cache.
-- **Cache warming:** an admin/CLI action (`p8 cache warm <urls>`) or config can pre-populate the cache after a deploy.
+- **Cache warming:** an admin/CLI action (`pulsate cache warm <urls>`) or config can pre-populate the cache after a deploy.
 
 ## Invalidation & cache tags
 
@@ -114,11 +114,11 @@ Beyond TTL, explicit invalidation:
   cache c { tag_header "cache-tag" }     # origin sends: Cache-Tag: product-42, listing
   ```
   ```bash
-  p8 cache purge --tag product-42       # CLI
+  pulsate cache purge --tag product-42       # CLI
   # or admin API: POST /v1/cache/purge {"tags":["product-42"]}
   ```
-- **By key/URL/prefix:** `p8 cache purge --url https://x/y` or `--prefix /assets/`.
-- **Purge-all:** `p8 cache purge --all` (scoped to a named cache).
+- **By key/URL/prefix:** `pulsate cache purge --url https://x/y` or `--prefix /assets/`.
+- **Purge-all:** `pulsate cache purge --all` (scoped to a named cache).
 - In a cluster, a purge propagates to all nodes (via the Redis store's pub/sub or the cluster bus — [16. Deployment](16-deployment.md)), so invalidation is fleet-wide and fast.
 - **Soft purge:** mark stale (eligible for SIE) instead of hard-deleting, so a bad purge doesn't strip your incident shield.
 

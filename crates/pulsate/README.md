@@ -5,7 +5,7 @@ limiting, observability, a loopback admin API and dashboard, and a sandboxed
 WASM plugin host, configured by a single file.
 
 ```sh
-cargo install pulsate            # installs the `pulsate` binary and its `p8` alias
+cargo install pulsate            # installs the `pulsate` binary and its `pulsate` alias
 pulsate up pulsate.flow
 ```
 

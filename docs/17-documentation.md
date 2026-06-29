@@ -49,7 +49,7 @@ squaretick.dev/pulsate/
 ## Tutorials
 
 Learning-oriented, hand-held, guaranteed to work:
-- **"Your first gateway in 60 seconds"** — install → `p8 init` → `p8 up` → HTTPS.
+- **"Your first gateway in 60 seconds"** — install → `pulsate init` → `pulsate up` → HTTPS.
 - **Framework quickstarts** — Rails, Node/Next, Go, Rust, static/SPA (one per stack, mirrors [14. DX](14-developer-experience.md)).
 - **"From laptop to production"** — the same config from dev to a VM to Kubernetes.
 - **"Build your first plugin"** — scaffold → middleware → test → load ([12. Plugins](12-plugins.md)).
@@ -100,7 +100,7 @@ In `contributing/` (and `CONTRIBUTING.md`):
 ## Tooling & quality
 
 - **Site:** a static docs site (e.g., mdBook or a Docusaurus-style generator) built in CI, versioned per release (so docs for 1.2 stay available), with full-text and **AI-answer-friendly** structure ([20. Future](20-future.md)).
-- **Doc tests:** code/config snippets are extracted and validated (`p8 validate`/`p8 fmt --check`/`cargo test --doc`) so no example rots.
+- **Doc tests:** code/config snippets are extracted and validated (`pulsate validate`/`pulsate fmt --check`/`cargo test --doc`) so no example rots.
 - **Link checking & coverage:** broken internal links fail CI; a "doc coverage" check ensures every public config key, CLI command, metric, and error code has a reference entry.
 - **Localization-ready** structure for future translation.
 

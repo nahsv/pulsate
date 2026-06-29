@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Implementations of the `p8` subcommands (kept here so the binary stays thin and the CLI is testable)."
+description = "Implementations of the `pulsate` subcommands (kept here so the binary stays thin and the CLI is testable)."
 
 [dependencies]
 pulsate-core = { path = "../pulsate-core", version = "0.2.0" }

@@ -40,7 +40,7 @@ Each code has: a title, a category, a severity, an HTTP status (if request-facin
 |---|---|---|
 | **Client** | the request is bad | 4xx response |
 | **Upstream** | a backend failed | 502/503/504 |
-| **Config** | invalid configuration | load-time / `p8 validate` / 422 on API |
+| **Config** | invalid configuration | load-time / `pulsate validate` / 422 on API |
 | **Security** | blocked by policy | 401/403/429 |
 | **Internal** | a Pulsate-side fault | 500 + log; never leaks detail to client |
 | **Operational** | env/runtime condition | startup failure / exit code / metric |

@@ -379,15 +379,15 @@ mod tests {
 
     #[test]
     fn semicolons_are_separators() {
-        let k = kinds("user \"p8\"; group \"p8\"");
+        let k = kinds("user \"pulsate\"; group \"pulsate\"");
         assert_eq!(
             k,
             vec![
                 TokenKind::Atom("user".into()),
-                TokenKind::Str("p8".into()),
+                TokenKind::Str("pulsate".into()),
                 TokenKind::Sep,
                 TokenKind::Atom("group".into()),
-                TokenKind::Str("p8".into()),
+                TokenKind::Str("pulsate".into()),
                 TokenKind::Eof,
             ]
         );

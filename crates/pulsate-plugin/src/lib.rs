@@ -20,7 +20,7 @@ pub const ABI_VERSION: i32 = 1;
 /// fails to instantiate.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Capabilities {
-    /// May call `p8::log(i32)`.
+    /// May call `pulsate::log(i32)`.
     pub log: bool,
 }
 
@@ -55,7 +55,7 @@ impl std::error::Error for PluginError {}
 pub struct RunResult {
     /// The value `eval` returned.
     pub output: i32,
-    /// Values the plugin sent to `p8::log`.
+    /// Values the plugin sent to `pulsate::log`.
     pub logs: Vec<i32>,
     /// Fuel consumed by the call.
     pub fuel_used: u64,
@@ -133,7 +133,7 @@ impl PluginHost {
         let mut linker = Linker::new(&self.engine);
         if caps.log {
             linker
-                .func_wrap("p8", "log", |mut caller: Caller<'_, HostState>, x: i32| {
+                .func_wrap("pulsate", "log", |mut caller: Caller<'_, HostState>, x: i32| {
                     caller.data_mut().logs.push(x);
                 })
                 .map_err(|e| PluginError::new(Code::PLG_LOAD, format!("linker error: {e}")))?;
@@ -223,14 +223,14 @@ mod tests {
     // A well-formed plugin: ABI v1, `eval` doubles its input, logs the result.
     const GOOD: &str = r#"
         (module
-          (import "p8" "log" (func $log (param i32)))
+          (import "pulsate" "log" (func $log (param i32)))
           (func (export "pulsate_abi_version") (result i32) (i32.const 1))
           (func (export "eval") (param i32) (result i32)
             (call $log (i32.mul (local.get 0) (i32.const 2)))
             (i32.mul (local.get 0) (i32.const 2))))
     "#;
 
-    // No `p8::log` import — runs without the `log` capability.
+    // No `pulsate::log` import — runs without the `log` capability.
     const NO_IMPORT: &str = r#"
         (module
           (func (export "pulsate_abi_version") (result i32) (i32.const 1))
@@ -268,7 +268,7 @@ mod tests {
     fn ungranted_capability_is_denied() {
         let host = PluginHost::new().unwrap();
         let plugin = host.load("doubler", GOOD.as_bytes()).unwrap();
-        // GOOD imports `p8::log` but we grant nothing.
+        // GOOD imports `pulsate::log` but we grant nothing.
         let err = host
             .run(&plugin, Capabilities::default(), 100_000, 1)
             .unwrap_err();

@@ -68,7 +68,7 @@ This keeps big decisions transparent and prevents bikeshedding in code review. A
 ## Issue & PR templates
 
 Provided in `.github/` (or platform equivalent):
-- **Bug report:** version (`p8 version`), platform, minimal `pulsate.flow` repro, expected vs actual, logs (with redaction reminder), `p8 doctor` output.
+- **Bug report:** version (`pulsate version`), platform, minimal `pulsate.flow` repro, expected vs actual, logs (with redaction reminder), `pulsate doctor` output.
 - **Feature request:** problem, proposed solution, alternatives, whether it needs an RFC.
 - **Security:** *not* a public template — routes to the security policy below.
 - **PR template:** description, linked issue/RFC, type (feat/fix/docs), checklist (tests, docs, DCO, breaking-change note, changelog entry).

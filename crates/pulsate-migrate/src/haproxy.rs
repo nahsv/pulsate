@@ -23,7 +23,7 @@ struct Section {
 pub fn import(text: &str) -> Import {
     let sections = parse(text);
     let mut b = Builder::default();
-    b.line("# Imported from HAProxy by `p8 import haproxy`. Review the notes.");
+    b.line("# Imported from HAProxy by `pulsate import haproxy`. Review the notes.");
 
     // First pass: every `backend`/`listen` with servers becomes an upstream so
     // sites can reference it by name.

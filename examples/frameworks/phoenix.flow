@@ -10,8 +10,8 @@
 #        PORT=4000 PHX_HOST=example.com _build/prod/rel/myapp/bin/myapp start
 #   2. In config/runtime.exs the Endpoint should listen on 127.0.0.1:4000 and
 #      have `check_origin` allow https://example.com.
-#   3. p8 validate examples/frameworks/phoenix.flow
-#      sudo p8 up examples/frameworks/phoenix.flow
+#   3. pulsate validate examples/frameworks/phoenix.flow
+#      sudo pulsate up examples/frameworks/phoenix.flow
 #   4. Verify LiveView:  open https://example.com — the socket should connect.
 # =================================================================
 

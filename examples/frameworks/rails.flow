@@ -10,8 +10,8 @@
 #      (Precompile assets first: RAILS_ENV=production bin/rails assets:precompile)
 #   2. Point DNS for myapp.com / www.myapp.com at this host.
 #   3. Validate + serve this file:
-#        p8 validate examples/frameworks/rails.flow
-#        sudo p8 up examples/frameworks/rails.flow
+#        pulsate validate examples/frameworks/rails.flow
+#        sudo pulsate up examples/frameworks/rails.flow
 #      Pulsate fetches a Let's Encrypt cert automatically (port 80+443).
 #   4. Verify:  curl -I https://myapp.com   →  200 + HSTS, http/2
 # =================================================================

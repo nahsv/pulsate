@@ -13,7 +13,7 @@
 //! - `eval(i32) -> i32`, the entry point the host calls per request.
 //!
 //! A plugin *may* import (only if granted the matching capability):
-//! - `p8::log(i32)` — record a value to the host log (`log` capability).
+//! - `pulsate::log(i32)` — record a value to the host log (`log` capability).
 //!
 //! The [`declare_plugin!`] macro emits the ABI export so authors only write
 //! `eval`.

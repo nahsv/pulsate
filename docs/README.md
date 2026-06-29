@@ -10,7 +10,7 @@
 
 The reverse-proxy market forces a choice between *developer-friendly but you outgrow it* (Caddy) and *infinitely capable but operationally heavy* (Nginx-as-ingress, Envoy, Traefik). Pulsate refuses that trade-off. It rebuilds the gateway from first principles in memory-safe Rust around a single coherent idea: **a configuration that reads the way a request flows**, compiled into an immutable snapshot that a lock-free data plane serves while an in-process control plane manages TLS, config, and policy.
 
-The result is a gateway a solo developer runs in 30 seconds (`p8 up` → automatic HTTPS) whose *same config shape* scales to a multi-tenant, multi-region enterprise fleet — without ever switching tools.
+The result is a gateway a solo developer runs in 30 seconds (`pulsate up` → automatic HTTPS) whose *same config shape* scales to a multi-tenant, multi-region enterprise fleet — without ever switching tools.
 
 The ten design pillars: **one binary · one config · one command · secure by default · batteries included · extremely easy to use · production-ready · extensible · cloud-native · enterprise-capable.** See [01. Vision](01-vision.md).
 
@@ -18,7 +18,7 @@ The ten design pillars: **one binary · one config · one command · secure by d
 
 | Property | Decision |
 |---|---|
-| Name / binary | **Pulsate** / `p8` |
+| Name / binary | **Pulsate** / `pulsate` |
 | Language / edition / MSRV | Rust · edition 2021 · MSRV = latest stable − 2 |
 | Async runtime | Tokio, behind a `pulsate-rt` abstraction (future io_uring/thread-per-core backend) |
 | HTTP stack | hyper (HTTP/1.1 + HTTP/2) · quinn + h3 (HTTP/3/QUIC) |
@@ -59,7 +59,7 @@ The plan is **34 documents**: 20 core documents (`01`–`20`) covering vision th
 | 10 | [Performance](10-performance.md) | Goals, benchmark methodology, lock-free design, allocation, SIMD, kernel offloads. |
 | 11 | [Dashboard](11-dashboard.md) | Embedded UI: metrics, live logs, config editor, cert manager, request inspector. |
 | 12 | [Plugins](12-plugins.md) | WASM extension model, sandboxing, WIT ABI, versioning, SDK, marketplace. |
-| 13 | [CLI](13-cli.md) | Every `p8` command, flags, validation, diagnostics, benchmark, migrate, upgrade. |
+| 13 | [CLI](13-cli.md) | Every `pulsate` command, flags, validation, diagnostics, benchmark, migrate, upgrade. |
 | 14 | [Developer Experience](14-developer-experience.md) | Install, init, app detection, Rails/Node/Go/Rust, Docker, K8s, dev/debug modes. |
 | 15 | [Observability](15-observability.md) | Metrics, tracing, OTel, Prometheus, structured logs, request IDs, correlation. |
 | 16 | [Deployment](16-deployment.md) | Bare metal, systemd, Docker, Compose, Kubernetes, cloud, multi-node, cluster. |
@@ -81,7 +81,7 @@ The plan is **34 documents**: 20 core documents (`01`–`20`) covering vision th
 | 27 | [Configuration Reference](27-config-reference.md) | Exhaustive key-by-key reference for the Flow format. |
 | 28 | [Testing & Conformance](28-testing-and-conformance.md) | Unit/property/fuzz/conformance/load/soak/chaos and release gates. |
 | 29 | [Multi-Tenancy & Isolation](29-multi-tenancy-and-isolation.md) | Tenant model, namespacing, quotas, RBAC, blast-radius containment. |
-| 30 | [Migration & Import](30-migration-and-import.md) | `p8 import` from nginx/Caddy/HAProxy/Apache with fidelity reporting. |
+| 30 | [Migration & Import](30-migration-and-import.md) | `pulsate import` from nginx/Caddy/HAProxy/Apache with fidelity reporting. |
 | 31 | [Benchmarking & Tuning](31-benchmarking-and-tuning.md) | Reproducible benchmark matrix and the operator tuning guide. |
 | 32 | [Disaster Recovery & HA](32-disaster-recovery-and-ha.md) | Redundancy, backup/restore, RPO/RTO, split-brain, runbooks. |
 | 33 | [Release Engineering & Supply Chain](33-release-engineering-and-supply-chain.md) | Reproducible builds, SBOM, signing/SLSA, channels, update verification. |
@@ -112,9 +112,9 @@ The plan is **34 documents**: 20 core documents (`01`–`20`) covering vision th
 
 **12 Plugins** — Why WebAssembly, the Wasmtime/Component-Model/WIT host model, capability-based sandboxing with fuel/epoch limits, independent ABI versioning, the SDK, and OCI-based signed distribution + marketplace.
 
-**13 CLI** — The complete `p8` command reference (lifecycle, config, certs, cache, diagnostics like `inspect`/`doctor`/`explain`, benchmark, plugins, import, upgrade) and stable exit codes.
+**13 CLI** — The complete `pulsate` command reference (lifecycle, config, certs, cache, diagnostics like `inspect`/`doctor`/`explain`, benchmark, plugins, import, upgrade) and stable exit codes.
 
-**14 Developer Experience** — The first-ten-minutes story: one-line install, `p8 init` with automatic app detection, per-framework recipes (Rails/Node/Go/Rust/static), Docker/Compose/Kubernetes integration, and dev/debug modes (local trusted HTTPS, browser diagnostics, live inspector).
+**14 Developer Experience** — The first-ten-minutes story: one-line install, `pulsate init` with automatic app detection, per-framework recipes (Rails/Node/Go/Rust/static), Docker/Compose/Kubernetes integration, and dev/debug modes (local trusted HTTPS, browser diagnostics, live inspector).
 
 **15 Observability** — Built-in metrics, OpenTelemetry tracing with per-stage spans and context propagation, Prometheus exposition, structured logs, and request IDs — all correlated so any request is followable end-to-end.
 
@@ -146,7 +146,7 @@ The plan is **34 documents**: 20 core documents (`01`–`20`) covering vision th
 
 **29 Multi-Tenancy & Isolation** — The tenant model, host/cache/limit namespacing, per-tenant quotas and noisy-neighbor protection, RBAC-scoped control plane, isolated telemetry/audit, per-tenant plugin sandboxing, and blast-radius containment.
 
-**30 Migration & Import** — `p8 import` for nginx/Caddy/HAProxy/Apache with directive mapping tables, a fidelity model (exact/approximate/manual/dropped), a safe shadow-then-cutover workflow, and honest limitations.
+**30 Migration & Import** — `pulsate import` for nginx/Caddy/HAProxy/Apache with directive mapping tables, a fidelity model (exact/approximate/manual/dropped), a safe shadow-then-cutover workflow, and honest limitations.
 
 **31 Benchmarking & Tuning** — Reference environments, the workload matrix, correct-latency tooling, fair apples-to-apples comparison methodology, no-cherry-pick reporting, and a practical OS/config/topology tuning guide.
 

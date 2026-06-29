@@ -149,7 +149,7 @@ From the route's perspective these are indistinguishable: `route /* ~> waf ~> pl
 
 ## Composition, ordering rules & pitfalls
 
-- **Put gatekeepers first.** WAF/auth/rate-limit before expensive work; otherwise you pay to reject. `p8 validate` warns about obvious anti-patterns (e.g., `proxy` before `jwt`, or `compress` before a body-transforming step).
+- **Put gatekeepers first.** WAF/auth/rate-limit before expensive work; otherwise you pay to reject. `pulsate validate` warns about obvious anti-patterns (e.g., `proxy` before `jwt`, or `compress` before a body-transforming step).
 - **Cache placement matters.** `cache` should sit *outside* (left of) `proxy` so hits skip the upstream, but *inside* (right of) auth if responses are user-specific — Pulsate lets you express both and warns when caching authenticated responses without a `vary`/key that includes identity.
 - **Compression vs. range/ETag.** `compress` interacts with caching and range requests; Pulsate coordinates these (compression-aware caching in [08. Cache](08-cache.md)) so you don't get corrupted partial responses.
 - **One handler per route.** Two terminal handlers in a chain is a load-time error.

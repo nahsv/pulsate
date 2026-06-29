@@ -130,13 +130,13 @@ Shipped as a rules file (illustrative):
 
 ```yaml
 groups:
-- name: p8.rules
+- name: pulsate.rules
   rules:
-  - record: p8:http_error_ratio:5m
+  - record: pulsate:http_error_ratio:5m
     expr: sum(rate(pulsate_http_requests_total{status_class="5xx"}[5m])) by (site)
         / sum(rate(pulsate_http_requests_total[5m])) by (site)
   - alert: PulsateHighErrorRate
-    expr: p8:http_error_ratio:5m > 0.02
+    expr: pulsate:http_error_ratio:5m > 0.02
     for: 10m
     labels: { severity: page }
   - alert: PulsateCertExpiringSoon

@@ -9,8 +9,8 @@
 #      In application.properties:
 #        server.forward-headers-strategy=framework
 #   2. Point DNS for example.com at this host.
-#   3. p8 validate examples/frameworks/spring-boot.flow
-#      sudo p8 up examples/frameworks/spring-boot.flow
+#   3. pulsate validate examples/frameworks/spring-boot.flow
+#      sudo pulsate up examples/frameworks/spring-boot.flow
 #   4. Verify:  curl -I https://example.com  → 200, http/2
 # =================================================================
 

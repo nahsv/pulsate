@@ -8,8 +8,8 @@
 #        PORT=3000 node server.js     # or: pm2 start server.js -i max
 #      Trust the proxy in Express:  app.set("trust proxy", 1)
 #   2. Point DNS for api.example.com at this host.
-#   3. p8 validate examples/frameworks/express.flow
-#      sudo p8 up examples/frameworks/express.flow
+#   3. pulsate validate examples/frameworks/express.flow
+#      sudo pulsate up examples/frameworks/express.flow
 #   4. Verify:  curl https://api.example.com/health
 # =================================================================
 

@@ -58,7 +58,7 @@ You opt *out* of protections explicitly; you never have to discover and enable t
 - **Rule engine:** evaluates ordered rules against request attributes (method, path, headers, query, body up to a bounded inspection size). Supports a built-in **OWASP CRS-compatible** ruleset plus custom rules.
 - **Modes:** `block` (reject matches) or `detect` (log only — for tuning before enforcing). Per-rule severity and actions (block/challenge/log/tag).
 - **Detections:** common injection classes (SQLi, XSS, path traversal, command injection, SSRF patterns), protocol anomalies, and oversized/malformed inputs.
-- **Custom rules** in a readable rule format (`/etc/p8/waf/*.rules`), hot-reloadable.
+- **Custom rules** in a readable rule format (`/etc/pulsate/waf/*.rules`), hot-reloadable.
 - **Performance:** rules compile to efficient matchers; body inspection is bounded and streamed; the WAF runs early in [Ingress] so blocked requests cost little.
 - **Tuning:** per-route rule exclusions, anomaly scoring with a configurable threshold (CRS-style), and false-positive reporting from the dashboard.
 
@@ -149,7 +149,7 @@ The `server`/`x-powered-by` headers are stripped by default (no version leakage)
 - **Backends:** environment, mounted file/dir, HashiCorp Vault, and cloud KMS/secret managers (AWS/GCP/Azure), plus plugin backends.
 - **Resolution:** secrets are fetched at load and on rotation; references are resolved into memory only, never written back to disk or logs.
 - **Rotation:** backends that support leases/rotation trigger a snapshot rebuild (e.g., a rotated upstream credential or TLS key) without downtime.
-- **Redaction:** secret values are redacted in logs, the dashboard, audit records, and `p8 config dump`.
+- **Redaction:** secret values are redacted in logs, the dashboard, audit records, and `pulsate config dump`.
 - **Encryption at rest:** the local state store (certs/keys) is encrypted with a key from the secrets backend/KMS.
 
 ## Audit logging

@@ -71,8 +71,8 @@ The split is *in-process*, which is the key departure from Envoy's external xDS 
 ## Process model
 
 - **Single process by default.** A supervisor task spawns and owns: listener tasks (one set per bound socket), the control-plane tasks, the observability exporter, and the admin/dashboard server. This is the simplest correct model and matches "one binary."
-- **Optional prefork workers** (`p8 up --workers N`, or `pulsate { workers N }`). Each worker is a forked process that binds the same ports via `SO_REUSEPORT`, letting the kernel load-balance accepted connections across workers. Workers share nothing except the listening sockets; each builds its own snapshot from the same config. Rationale: lets Pulsate scale past a single runtime's limits and isolates worker crashes, without a threading model that shares mutable request state.
-- **Privilege handling.** Pulsate may bind privileged ports (80/443) and then **drop privileges** to a configured unprivileged user/group before serving (`pulsate { user "p8"; group "p8" }`). On Linux, `CAP_NET_BIND_SERVICE` is the preferred alternative to running as root at all.
+- **Optional prefork workers** (`pulsate up --workers N`, or `pulsate { workers N }`). Each worker is a forked process that binds the same ports via `SO_REUSEPORT`, letting the kernel load-balance accepted connections across workers. Workers share nothing except the listening sockets; each builds its own snapshot from the same config. Rationale: lets Pulsate scale past a single runtime's limits and isolates worker crashes, without a threading model that shares mutable request state.
+- **Privilege handling.** Pulsate may bind privileged ports (80/443) and then **drop privileges** to a configured unprivileged user/group before serving (`pulsate { user "pulsate"; group "pulsate" }`). On Linux, `CAP_NET_BIND_SERVICE` is the preferred alternative to running as root at all.
 - **Supervision.** The supervisor restarts a crashed listener task with capped exponential backoff. A worker process that dies is respawned by the supervisor (single-process mode) or by the parent (prefork mode). Repeated immediate crashes trip a circuit and surface a fatal diagnostic rather than crash-looping.
 
 ## Thread model
@@ -185,13 +185,13 @@ new config arrives ─▶ parse+validate (control plane) ─▶ build new Config
 
 - **Listener reconciliation.** The reload diffs old vs new listener sets. Sockets that are unchanged keep serving; sockets that are added are bound; sockets that are removed are drained and closed. This means a reload that only changes a route never touches the listening sockets at all.
 - **Resource carry-over.** Upstream connection pools, the cache, and issued certificates are owned in registries keyed by identity (e.g., upstream name+target). The new snapshot references the same live pool object when the upstream is unchanged, so reloads do not cold-start connection pools or evict the cache.
-- **Triggers.** A reload can be triggered by `p8 reload` (signals the running process), a `SIGHUP`, a file-watch on `pulsate.flow` (`--watch`), or an admin-API call. All funnel into the same validate-build-swap path.
+- **Triggers.** A reload can be triggered by `pulsate reload` (signals the running process), a `SIGHUP`, a file-watch on `pulsate.flow` (`--watch`), or an admin-API call. All funnel into the same validate-build-swap path.
 - **Atomicity & rollback.** The swap is atomic; if a newly published snapshot causes elevated errors within a guard window, the control plane can auto-rollback to the previous snapshot (kept for one generation) — an operator-configurable safety net.
 
 ## Graceful shutdown
 
 ```
-signal (SIGTERM / `p8 down`) 
+signal (SIGTERM / `pulsate down`) 
   ▶ stop accepting new connections (close listener accept loops)
   ▶ broadcast Drain to all connection tasks
   ▶ HTTP/1.1: finish in-flight request, send `Connection: close`

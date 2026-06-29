@@ -11,8 +11,8 @@
 #       /ws route below.)
 #   2. In settings.py: SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 #      and ALLOWED_HOSTS = ["example.com"].
-#   3. p8 validate examples/frameworks/django.flow
-#      sudo p8 up examples/frameworks/django.flow
+#   3. pulsate validate examples/frameworks/django.flow
+#      sudo pulsate up examples/frameworks/django.flow
 #   4. Verify:  curl -I https://example.com/static/...  → cached, gzipped
 # =================================================================
 

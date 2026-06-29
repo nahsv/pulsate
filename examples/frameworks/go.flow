@@ -9,8 +9,8 @@
 #        PORT=8080 ./myservice            # http.ListenAndServe("127.0.0.1:8080", ...)
 #      Read the client IP from X-Forwarded-For (e.g. with a middleware).
 #   2. Point DNS for example.com at this host.
-#   3. p8 validate examples/frameworks/go.flow
-#      sudo p8 up examples/frameworks/go.flow
+#   3. pulsate validate examples/frameworks/go.flow
+#      sudo pulsate up examples/frameworks/go.flow
 #   4. Verify:  curl -I https://example.com  → 200, http/2
 # =================================================================
 

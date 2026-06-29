@@ -48,7 +48,7 @@ Routes do **not** depend on declaration order (unlike nginx `location` subtletie
    4. catch-all (`/*` or `/`)
 3. **Predicate refinement:** among equally-specific paths, a route with matching `[method=…]`/`[header.…]`/`[query.…]` predicates beats an unrefined one; if multiple match, the first in source order wins and a **load-time lint warns** about the ambiguity.
 
-`p8 validate` reports unreachable routes (shadowed by a more specific one) as warnings.
+`pulsate validate` reports unreachable routes (shadowed by a more specific one) as warnings.
 
 ## Host, path, regex, and predicate routing
 

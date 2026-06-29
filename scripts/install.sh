@@ -1,5 +1,5 @@
 #!/bin/sh
-# Install Pulsate (the `pulsate` binary and its `p8` alias) from GitHub releases.
+# Install Pulsate (the `pulsate` binary) from GitHub releases.
 #
 #   curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/squaretick/pulsate/main/scripts/install.sh | sh
 #
@@ -46,7 +46,7 @@ curl --proto '=https' --tlsv1.2 -fSL "$url" -o "$tmp/pulsate.tar.gz" \
   || err "download failed: $url"
 tar -xzf "$tmp/pulsate.tar.gz" -C "$tmp"
 
-# The archive contains both `pulsate` and `p8`.
+# The archive contains the `pulsate` binary.
 install_one() {
   src="$tmp/$1"
   [ -f "$src" ] || src="$(find "$tmp" -name "$1" -type f | head -1)"
@@ -59,7 +59,6 @@ install_one() {
   fi
 }
 install_one pulsate
-install_one p8
 
 echo "Installed: $("$BIN_DIR/pulsate" --version)"
 echo "Try: pulsate info"

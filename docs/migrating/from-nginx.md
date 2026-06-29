@@ -3,8 +3,8 @@
 Auto-translate first, then read this to understand and tune the result:
 
 ```sh
-p8 import nginx /etc/nginx/nginx.conf --diff     # preview
-p8 import nginx /etc/nginx/nginx.conf -o pulsate.flow
+pulsate import nginx /etc/nginx/nginx.conf --diff     # preview
+pulsate import nginx /etc/nginx/nginx.conf -o pulsate.flow
 ```
 
 ## Side by side

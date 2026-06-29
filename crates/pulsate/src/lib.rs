@@ -1,6 +1,5 @@
-//! Pulsate's command-line entry point, shared by the `p8` and `pulsate`
-//! binaries: parse the CLI, build the runtime, and dispatch to the command
-//! implementations in `pulsate-cli` (`docs/13-cli.md`).
+//! Pulsate's command-line entry point: parse the CLI, build the runtime, and
+//! dispatch to the command implementations in `pulsate-cli` (`docs/13-cli.md`).
 #![forbid(unsafe_code)]
 
 use std::net::SocketAddr;
@@ -10,9 +9,6 @@ use std::process::ExitCode;
 use clap::{Parser, Subcommand};
 
 /// Pulsate — one binary, one config, one command.
-///
-/// Installed under two names, `p8` and `pulsate`, which behave identically.
-/// `name` is left unset so usage reflects whichever was invoked.
 #[derive(Debug, Parser)]
 #[command(version, about = "The Pulsate application gateway")]
 struct Cli {
@@ -232,10 +228,9 @@ fn emit(outcome: &pulsate_cli::Outcome) -> ExitCode {
     ExitCode::from(outcome.code)
 }
 
-/// Print version and a short list of common commands, using the name the binary
-/// was invoked as (`p8` or `pulsate`).
+/// Print version and a short list of common commands.
 fn print_info() {
-    let bin = invoked_name();
+    let bin = "pulsate";
     let version = env!("CARGO_PKG_VERSION");
     println!("{bin} {version} — one binary, one config, one command");
     println!();
@@ -243,17 +238,4 @@ fn print_info() {
     println!("  {bin} validate <config>    check a config without starting");
     println!("  {bin} import <fmt> <file>  translate nginx/caddy/haproxy/apache to Flow");
     println!("  {bin} plugin run <file>    run a WASM plugin");
-}
-
-/// The base name the binary was invoked as, falling back to `pulsate`.
-fn invoked_name() -> String {
-    std::env::args()
-        .next()
-        .as_deref()
-        .map(std::path::Path::new)
-        .and_then(std::path::Path::file_stem)
-        .map_or_else(
-            || "pulsate".to_string(),
-            |s| s.to_string_lossy().into_owned(),
-        )
 }

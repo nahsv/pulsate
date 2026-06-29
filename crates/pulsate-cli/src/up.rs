@@ -1,4 +1,4 @@
-//! `p8 up` — load a config and serve it.
+//! `pulsate up` — load a config and serve it.
 //!
 //! Compile the config into a routing table, bind a plain-HTTP listener (and
 //! optionally a TLS listener), and serve until a shutdown signal (Ctrl-C /
@@ -20,7 +20,7 @@ use pulsate_net::ListenerConfig;
 use pulsate_waf::AuditLog;
 use tokio::sync::watch;
 
-/// Options for `p8 up`.
+/// Options for `pulsate up`.
 #[derive(Debug, Clone)]
 pub struct UpOptions {
     /// Path to the config file.
@@ -39,7 +39,7 @@ pub struct UpOptions {
     pub http3_port: Option<u16>,
 }
 
-/// TLS listener options for `p8 up`.
+/// TLS listener options for `pulsate up`.
 #[derive(Debug, Clone)]
 pub struct TlsOptions {
     /// TLS listen address.
