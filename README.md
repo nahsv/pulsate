@@ -177,60 +177,60 @@ the crate, or the **docs** link for its API.
 
 **Binary & CLI**
 
-| Crate | Docs | Description |
-| --- | --- | --- |
-| [![pulsate](https://img.shields.io/crates/v/pulsate?label=pulsate)](https://crates.io/crates/pulsate) | [docs](https://docs.rs/pulsate) | The `pulsate` binary: one gateway with TLS, caching, WAF, observability, admin API, and WASM plugins. |
-| [![pulsate-cli](https://img.shields.io/crates/v/pulsate-cli?label=pulsate-cli)](https://crates.io/crates/pulsate-cli) | [docs](https://docs.rs/pulsate-cli) | Implementations of the `pulsate` subcommands, kept separate so the binary stays thin and testable. |
-| [![pulsate-migrate](https://img.shields.io/crates/v/pulsate-migrate?label=pulsate-migrate)](https://crates.io/crates/pulsate-migrate) | [docs](https://docs.rs/pulsate-migrate) | Config importers: nginx / Caddy / HAProxy / Apache → Flow, with a fidelity report. |
+| Crate | Docs | Downloads | Description |
+| --- | --- | --- | --- |
+| [![pulsate](https://img.shields.io/crates/v/pulsate?label=pulsate)](https://crates.io/crates/pulsate) | [docs](https://docs.rs/pulsate) | [![downloads](https://img.shields.io/crates/d/pulsate.svg)](https://crates.io/crates/pulsate) | The `pulsate` binary: one gateway with TLS, caching, WAF, observability, admin API, and WASM plugins. |
+| [![pulsate-cli](https://img.shields.io/crates/v/pulsate-cli?label=pulsate-cli)](https://crates.io/crates/pulsate-cli) | [docs](https://docs.rs/pulsate-cli) | [![downloads](https://img.shields.io/crates/d/pulsate-cli.svg)](https://crates.io/crates/pulsate-cli) | Implementations of the `pulsate` subcommands, kept separate so the binary stays thin and testable. |
+| [![pulsate-migrate](https://img.shields.io/crates/v/pulsate-migrate?label=pulsate-migrate)](https://crates.io/crates/pulsate-migrate) | [docs](https://docs.rs/pulsate-migrate) | [![downloads](https://img.shields.io/crates/d/pulsate-migrate.svg)](https://crates.io/crates/pulsate-migrate) | Config importers: nginx / Caddy / HAProxy / Apache → Flow, with a fidelity report. |
 
 **Foundation**
 
-| Crate | Docs | Description |
-| --- | --- | --- |
-| [![pulsate-core](https://img.shields.io/crates/v/pulsate-core?label=pulsate-core)](https://crates.io/crates/pulsate-core) | [docs](https://docs.rs/pulsate-core) | Shared vocabulary: `RequestCtx`, `Request`/`Response`, the `PulsateError` taxonomy, core traits, `ConfigSnapshot`. |
-| [![pulsate-rt](https://img.shields.io/crates/v/pulsate-rt?label=pulsate-rt)](https://crates.io/crates/pulsate-rt) | [docs](https://docs.rs/pulsate-rt) | Async runtime abstraction (Tokio backend); the seam for a future thread-per-core io_uring runtime. |
-| [![pulsate-util](https://img.shields.io/crates/v/pulsate-util?label=pulsate-util)](https://crates.io/crates/pulsate-util) | [docs](https://docs.rs/pulsate-util) | Buffer pools, duration/size parsing, and small shared helpers. |
-| [![pulsate-config](https://img.shields.io/crates/v/pulsate-config?label=pulsate-config)](https://crates.io/crates/pulsate-config) | [docs](https://docs.rs/pulsate-config) | Typed config model, snapshot build, validation, and the arc-swap-published config store. |
-| [![pulsate-flow](https://img.shields.io/crates/v/pulsate-flow?label=pulsate-flow)](https://crates.io/crates/pulsate-flow) | [docs](https://docs.rs/pulsate-flow) | The Flow language: hand-written lexer, recursive-descent parser, typed AST, span-accurate diagnostics. |
+| Crate | Docs | Downloads | Description |
+| --- | --- | --- | --- |
+| [![pulsate-core](https://img.shields.io/crates/v/pulsate-core?label=pulsate-core)](https://crates.io/crates/pulsate-core) | [docs](https://docs.rs/pulsate-core) | [![downloads](https://img.shields.io/crates/d/pulsate-core.svg)](https://crates.io/crates/pulsate-core) | Shared vocabulary: `RequestCtx`, `Request`/`Response`, the `PulsateError` taxonomy, core traits, `ConfigSnapshot`. |
+| [![pulsate-rt](https://img.shields.io/crates/v/pulsate-rt?label=pulsate-rt)](https://crates.io/crates/pulsate-rt) | [docs](https://docs.rs/pulsate-rt) | [![downloads](https://img.shields.io/crates/d/pulsate-rt.svg)](https://crates.io/crates/pulsate-rt) | Async runtime abstraction (Tokio backend); the seam for a future thread-per-core io_uring runtime. |
+| [![pulsate-util](https://img.shields.io/crates/v/pulsate-util?label=pulsate-util)](https://crates.io/crates/pulsate-util) | [docs](https://docs.rs/pulsate-util) | [![downloads](https://img.shields.io/crates/d/pulsate-util.svg)](https://crates.io/crates/pulsate-util) | Buffer pools, duration/size parsing, and small shared helpers. |
+| [![pulsate-config](https://img.shields.io/crates/v/pulsate-config?label=pulsate-config)](https://crates.io/crates/pulsate-config) | [docs](https://docs.rs/pulsate-config) | [![downloads](https://img.shields.io/crates/d/pulsate-config.svg)](https://crates.io/crates/pulsate-config) | Typed config model, snapshot build, validation, and the arc-swap-published config store. |
+| [![pulsate-flow](https://img.shields.io/crates/v/pulsate-flow?label=pulsate-flow)](https://crates.io/crates/pulsate-flow) | [docs](https://docs.rs/pulsate-flow) | [![downloads](https://img.shields.io/crates/d/pulsate-flow.svg)](https://crates.io/crates/pulsate-flow) | The Flow language: hand-written lexer, recursive-descent parser, typed AST, span-accurate diagnostics. |
 
 **Data plane**
 
-| Crate | Docs | Description |
-| --- | --- | --- |
-| [![pulsate-net](https://img.shields.io/crates/v/pulsate-net?label=pulsate-net)](https://crates.io/crates/pulsate-net) | [docs](https://docs.rs/pulsate-net) | Listeners, socket options (SO_REUSEPORT), connection limits, accept loop, graceful drain. |
-| [![pulsate-tls](https://img.shields.io/crates/v/pulsate-tls?label=pulsate-tls)](https://crates.io/crates/pulsate-tls) | [docs](https://docs.rs/pulsate-tls) | rustls server config: SNI certificate resolution, ALPN, manual certs (mTLS to follow). |
-| [![pulsate-http](https://img.shields.io/crates/v/pulsate-http?label=pulsate-http)](https://crates.io/crates/pulsate-http) | [docs](https://docs.rs/pulsate-http) | HTTP/1.1 + HTTP/2 serving over hyper: normalize to `Request`/`Response`, run terminal handlers. |
-| [![pulsate-http3](https://img.shields.io/crates/v/pulsate-http3?label=pulsate-http3)](https://crates.io/crates/pulsate-http3) | [docs](https://docs.rs/pulsate-http3) | HTTP/3 over QUIC. |
-| [![pulsate-router](https://img.shields.io/crates/v/pulsate-router?label=pulsate-router)](https://crates.io/crates/pulsate-router) | [docs](https://docs.rs/pulsate-router) | Routing table + matchers (host/path/regex/method/weighted). |
-| [![pulsate-pipeline](https://img.shields.io/crates/v/pulsate-pipeline?label=pulsate-pipeline)](https://crates.io/crates/pulsate-pipeline) | [docs](https://docs.rs/pulsate-pipeline) | Middleware engine (Ingress/Egress) and built-ins: strip_prefix, headers, cors. |
-| [![pulsate-proxy](https://img.shields.io/crates/v/pulsate-proxy?label=pulsate-proxy)](https://crates.io/crates/pulsate-proxy) | [docs](https://docs.rs/pulsate-proxy) | Reverse proxy: upstream pools, load balancing, retries, passive ejection / circuit breaking, forwarded headers. |
-| [![pulsate-cache](https://img.shields.io/crates/v/pulsate-cache?label=pulsate-cache)](https://crates.io/crates/pulsate-cache) | [docs](https://docs.rs/pulsate-cache) | HTTP caching: in-memory store, RFC-9111 freshness, validators, stale-while-revalidate, tag-based purge. |
-| [![pulsate-waf](https://img.shields.io/crates/v/pulsate-waf?label=pulsate-waf)](https://crates.io/crates/pulsate-waf) | [docs](https://docs.rs/pulsate-waf) | WAF signatures, rate limiting, IP allow/deny (CIDR), and a tamper-evident audit log. |
+| Crate | Docs | Downloads | Description |
+| --- | --- | --- | --- |
+| [![pulsate-net](https://img.shields.io/crates/v/pulsate-net?label=pulsate-net)](https://crates.io/crates/pulsate-net) | [docs](https://docs.rs/pulsate-net) | [![downloads](https://img.shields.io/crates/d/pulsate-net.svg)](https://crates.io/crates/pulsate-net) | Listeners, socket options (SO_REUSEPORT), connection limits, accept loop, graceful drain. |
+| [![pulsate-tls](https://img.shields.io/crates/v/pulsate-tls?label=pulsate-tls)](https://crates.io/crates/pulsate-tls) | [docs](https://docs.rs/pulsate-tls) | [![downloads](https://img.shields.io/crates/d/pulsate-tls.svg)](https://crates.io/crates/pulsate-tls) | rustls server config: SNI certificate resolution, ALPN, manual certs (mTLS to follow). |
+| [![pulsate-http](https://img.shields.io/crates/v/pulsate-http?label=pulsate-http)](https://crates.io/crates/pulsate-http) | [docs](https://docs.rs/pulsate-http) | [![downloads](https://img.shields.io/crates/d/pulsate-http.svg)](https://crates.io/crates/pulsate-http) | HTTP/1.1 + HTTP/2 serving over hyper: normalize to `Request`/`Response`, run terminal handlers. |
+| [![pulsate-http3](https://img.shields.io/crates/v/pulsate-http3?label=pulsate-http3)](https://crates.io/crates/pulsate-http3) | [docs](https://docs.rs/pulsate-http3) | [![downloads](https://img.shields.io/crates/d/pulsate-http3.svg)](https://crates.io/crates/pulsate-http3) | HTTP/3 over QUIC. |
+| [![pulsate-router](https://img.shields.io/crates/v/pulsate-router?label=pulsate-router)](https://crates.io/crates/pulsate-router) | [docs](https://docs.rs/pulsate-router) | [![downloads](https://img.shields.io/crates/d/pulsate-router.svg)](https://crates.io/crates/pulsate-router) | Routing table + matchers (host/path/regex/method/weighted). |
+| [![pulsate-pipeline](https://img.shields.io/crates/v/pulsate-pipeline?label=pulsate-pipeline)](https://crates.io/crates/pulsate-pipeline) | [docs](https://docs.rs/pulsate-pipeline) | [![downloads](https://img.shields.io/crates/d/pulsate-pipeline.svg)](https://crates.io/crates/pulsate-pipeline) | Middleware engine (Ingress/Egress) and built-ins: strip_prefix, headers, cors. |
+| [![pulsate-proxy](https://img.shields.io/crates/v/pulsate-proxy?label=pulsate-proxy)](https://crates.io/crates/pulsate-proxy) | [docs](https://docs.rs/pulsate-proxy) | [![downloads](https://img.shields.io/crates/d/pulsate-proxy.svg)](https://crates.io/crates/pulsate-proxy) | Reverse proxy: upstream pools, load balancing, retries, passive ejection / circuit breaking, forwarded headers. |
+| [![pulsate-cache](https://img.shields.io/crates/v/pulsate-cache?label=pulsate-cache)](https://crates.io/crates/pulsate-cache) | [docs](https://docs.rs/pulsate-cache) | [![downloads](https://img.shields.io/crates/d/pulsate-cache.svg)](https://crates.io/crates/pulsate-cache) | HTTP caching: in-memory store, RFC-9111 freshness, validators, stale-while-revalidate, tag-based purge. |
+| [![pulsate-waf](https://img.shields.io/crates/v/pulsate-waf?label=pulsate-waf)](https://crates.io/crates/pulsate-waf) | [docs](https://docs.rs/pulsate-waf) | [![downloads](https://img.shields.io/crates/d/pulsate-waf.svg)](https://crates.io/crates/pulsate-waf) | WAF signatures, rate limiting, IP allow/deny (CIDR), and a tamper-evident audit log. |
 
 **Control plane**
 
-| Crate | Docs | Description |
-| --- | --- | --- |
-| [![pulsate-control](https://img.shields.io/crates/v/pulsate-control?label=pulsate-control)](https://crates.io/crates/pulsate-control) | [docs](https://docs.rs/pulsate-control) | Control-plane orchestrator and REST admin API (token auth + RBAC, loopback by default). |
-| [![pulsate-acme](https://img.shields.io/crates/v/pulsate-acme?label=pulsate-acme)](https://crates.io/crates/pulsate-acme) | [docs](https://docs.rs/pulsate-acme) | ACME plumbing: HTTP-01 challenge store, dynamic certificate store, on-demand allow-list. |
-| [![pulsate-secrets](https://img.shields.io/crates/v/pulsate-secrets?label=pulsate-secrets)](https://crates.io/crates/pulsate-secrets) | [docs](https://docs.rs/pulsate-secrets) | Secrets backends: environment and file (Vault / cloud KMS to follow). |
-| [![pulsate-cluster](https://img.shields.io/crates/v/pulsate-cluster?label=pulsate-cluster)](https://crates.io/crates/pulsate-cluster) | [docs](https://docs.rs/pulsate-cluster) | Clustering: membership, leader/peer roles, shared state. |
-| [![pulsate-k8s](https://img.shields.io/crates/v/pulsate-k8s?label=pulsate-k8s)](https://crates.io/crates/pulsate-k8s) | [docs](https://docs.rs/pulsate-k8s) | Kubernetes Gateway API controller: reconciles Gateway/HTTPRoute into a live config snapshot. |
-| [![pulsate-observe](https://img.shields.io/crates/v/pulsate-observe?label=pulsate-observe)](https://crates.io/crates/pulsate-observe) | [docs](https://docs.rs/pulsate-observe) | Observability: Prometheus metrics + exposition, request IDs, structured JSON access logs. |
+| Crate | Docs | Downloads | Description |
+| --- | --- | --- | --- |
+| [![pulsate-control](https://img.shields.io/crates/v/pulsate-control?label=pulsate-control)](https://crates.io/crates/pulsate-control) | [docs](https://docs.rs/pulsate-control) | [![downloads](https://img.shields.io/crates/d/pulsate-control.svg)](https://crates.io/crates/pulsate-control) | Control-plane orchestrator and REST admin API (token auth + RBAC, loopback by default). |
+| [![pulsate-acme](https://img.shields.io/crates/v/pulsate-acme?label=pulsate-acme)](https://crates.io/crates/pulsate-acme) | [docs](https://docs.rs/pulsate-acme) | [![downloads](https://img.shields.io/crates/d/pulsate-acme.svg)](https://crates.io/crates/pulsate-acme) | ACME plumbing: HTTP-01 challenge store, dynamic certificate store, on-demand allow-list. |
+| [![pulsate-secrets](https://img.shields.io/crates/v/pulsate-secrets?label=pulsate-secrets)](https://crates.io/crates/pulsate-secrets) | [docs](https://docs.rs/pulsate-secrets) | [![downloads](https://img.shields.io/crates/d/pulsate-secrets.svg)](https://crates.io/crates/pulsate-secrets) | Secrets backends: environment and file (Vault / cloud KMS to follow). |
+| [![pulsate-cluster](https://img.shields.io/crates/v/pulsate-cluster?label=pulsate-cluster)](https://crates.io/crates/pulsate-cluster) | [docs](https://docs.rs/pulsate-cluster) | [![downloads](https://img.shields.io/crates/d/pulsate-cluster.svg)](https://crates.io/crates/pulsate-cluster) | Clustering: membership, leader/peer roles, shared state. |
+| [![pulsate-k8s](https://img.shields.io/crates/v/pulsate-k8s?label=pulsate-k8s)](https://crates.io/crates/pulsate-k8s) | [docs](https://docs.rs/pulsate-k8s) | [![downloads](https://img.shields.io/crates/d/pulsate-k8s.svg)](https://crates.io/crates/pulsate-k8s) | Kubernetes Gateway API controller: reconciles Gateway/HTTPRoute into a live config snapshot. |
+| [![pulsate-observe](https://img.shields.io/crates/v/pulsate-observe?label=pulsate-observe)](https://crates.io/crates/pulsate-observe) | [docs](https://docs.rs/pulsate-observe) | [![downloads](https://img.shields.io/crates/d/pulsate-observe.svg)](https://crates.io/crates/pulsate-observe) | Observability: Prometheus metrics + exposition, request IDs, structured JSON access logs. |
 
 **Plugins**
 
-| Crate | Docs | Description |
-| --- | --- | --- |
-| [![pulsate-plugin](https://img.shields.io/crates/v/pulsate-plugin?label=pulsate-plugin)](https://crates.io/crates/pulsate-plugin) | [docs](https://docs.rs/pulsate-plugin) | WASM plugin host (Wasmtime): fuel/epoch limits, capability sandbox, ABI versioning. |
-| [![pulsate-sdk](https://img.shields.io/crates/v/pulsate-sdk?label=pulsate-sdk)](https://crates.io/crates/pulsate-sdk) | [docs](https://docs.rs/pulsate-sdk) | Guest-side SDK for plugin authors. |
+| Crate | Docs | Downloads | Description |
+| --- | --- | --- | --- |
+| [![pulsate-plugin](https://img.shields.io/crates/v/pulsate-plugin?label=pulsate-plugin)](https://crates.io/crates/pulsate-plugin) | [docs](https://docs.rs/pulsate-plugin) | [![downloads](https://img.shields.io/crates/d/pulsate-plugin.svg)](https://crates.io/crates/pulsate-plugin) | WASM plugin host (Wasmtime): fuel/epoch limits, capability sandbox, ABI versioning. |
+| [![pulsate-sdk](https://img.shields.io/crates/v/pulsate-sdk?label=pulsate-sdk)](https://crates.io/crates/pulsate-sdk) | [docs](https://docs.rs/pulsate-sdk) | [![downloads](https://img.shields.io/crates/d/pulsate-sdk.svg)](https://crates.io/crates/pulsate-sdk) | Guest-side SDK for plugin authors. |
 
 **UI & testing**
 
-| Crate | Docs | Description |
-| --- | --- | --- |
-| [![pulsate-dashboard](https://img.shields.io/crates/v/pulsate-dashboard?label=pulsate-dashboard)](https://crates.io/crates/pulsate-dashboard) | [docs](https://docs.rs/pulsate-dashboard) | The embedded dashboard: static assets served by the admin server. |
-| [![pulsate-test](https://img.shields.io/crates/v/pulsate-test?label=pulsate-test)](https://crates.io/crates/pulsate-test) | [docs](https://docs.rs/pulsate-test) | Test harness, fakes, and conformance utilities. |
+| Crate | Docs | Downloads | Description |
+| --- | --- | --- | --- |
+| [![pulsate-dashboard](https://img.shields.io/crates/v/pulsate-dashboard?label=pulsate-dashboard)](https://crates.io/crates/pulsate-dashboard) | [docs](https://docs.rs/pulsate-dashboard) | [![downloads](https://img.shields.io/crates/d/pulsate-dashboard.svg)](https://crates.io/crates/pulsate-dashboard) | The embedded dashboard: static assets served by the admin server. |
+| [![pulsate-test](https://img.shields.io/crates/v/pulsate-test?label=pulsate-test)](https://crates.io/crates/pulsate-test) | [docs](https://docs.rs/pulsate-test) | [![downloads](https://img.shields.io/crates/d/pulsate-test.svg)](https://crates.io/crates/pulsate-test) | Test harness, fakes, and conformance utilities. |
 
 ## Building & testing
 
