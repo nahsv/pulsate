@@ -24,7 +24,14 @@ pub struct Gateway {
     pub telemetry: Arc<Telemetry>,
     /// `Alt-Svc` header value to advertise (HTTP/3 discovery), if any.
     pub alt_svc: Option<String>,
+    /// Maximum inbound request-body size, in bytes. Requests whose body exceeds
+    /// this are rejected with `413 Payload Too Large` before dispatch (H3).
+    pub max_request_body_bytes: usize,
 }
+
+/// Default cap on an inbound request body (64 MiB). Generous for normal uploads
+/// but bounds memory under a flood of large/slow POSTs.
+pub const DEFAULT_MAX_REQUEST_BODY_BYTES: usize = 64 << 20;
 
 impl Gateway {
     /// Build a gateway from a router and upstream registry, creating a fresh
@@ -48,6 +55,7 @@ impl Gateway {
             client: ProxyClient::new(),
             telemetry,
             alt_svc: None,
+            max_request_body_bytes: DEFAULT_MAX_REQUEST_BODY_BYTES,
         }
     }
 
@@ -55,6 +63,13 @@ impl Gateway {
     #[must_use]
     pub fn with_alt_svc(mut self, alt_svc: Option<String>) -> Self {
         self.alt_svc = alt_svc;
+        self
+    }
+
+    /// Override the maximum inbound request-body size (bytes).
+    #[must_use]
+    pub fn with_max_request_body_bytes(mut self, max: usize) -> Self {
+        self.max_request_body_bytes = max;
         self
     }
 }

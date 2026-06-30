@@ -128,9 +128,11 @@ pub fn ingress(pipeline: &[Mw], req: &mut RequestView) -> Option<Response> {
 /// Build the rate-limit bucket key for a request.
 fn rate_key(key: &str, req: &RequestView) -> String {
     match key {
+        // Canonicalize so an IPv4-mapped IPv6 client shares one bucket with its
+        // plain-v4 form and cannot multiply its budget (M7).
         "ip" => req
             .client_ip
-            .map_or_else(|| "unknown".to_string(), |ip| ip.to_string()),
+            .map_or_else(|| "unknown".to_string(), |ip| ip.to_canonical().to_string()),
         other => format!("{other}:{}", req.path),
     }
 }

@@ -94,6 +94,14 @@ tokio-rustls = { version = "0.26", default-features = false, features = ["ring",
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
 rustls-pemfile = "2"
 socket2 = { version = "0.5", features = ["all"] }
+# Cryptographic primitives (CSPRNG, HMAC-SHA256, SHA-256, constant-time compare).
+# `ring` is already in the dependency graph via rustls; pinning it here lets the
+# admin token, audit-chain HMAC, and constant-time token compare share one impl.
+ring = "0.17"
+# Best-effort zeroing of secret material on drop.
+zeroize = "1"
+# Constant-time byte comparison for token authentication.
+constant_time_eq = "0.3"
 
 # Workspace-wide lint policy (docs/03-repository.md: coding standards). Members opt
 # in with `[lints] workspace = true`. Kept as `warn` so scaffold builds stay green;

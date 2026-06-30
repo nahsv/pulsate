@@ -286,10 +286,22 @@ async fn handle_request(
     let (parts, ()) = request.into_parts();
 
     // Buffer the full request body so the shared dispatch core (which consumes one
-    // `Bytes`) sees the same input as the HTTP/1 and HTTP/2 path.
+    // `Bytes`) sees the same input as the HTTP/1 and HTTP/2 path. Track the running
+    // length and abort with 413 once it exceeds the configured cap (H3).
+    let max_body = gateway.max_request_body_bytes;
     let mut body = BytesMut::new();
     while let Some(mut chunk) = stream.recv_data().await? {
-        body.put(chunk.copy_to_bytes(chunk.remaining()));
+        let data = chunk.copy_to_bytes(chunk.remaining());
+        if body.len().saturating_add(data.len()) > max_body {
+            let (head, payload) = translate(&payload_too_large());
+            stream.send_response(head).await?;
+            if !payload.is_empty() {
+                stream.send_data(payload).await?;
+            }
+            stream.finish().await?;
+            return Ok(());
+        }
+        body.put(data);
     }
 
     let response = crate::dispatch::dispatch(parts, body.freeze(), peer, &gateway).await;
@@ -301,6 +313,16 @@ async fn handle_request(
     }
     stream.finish().await?;
     Ok(())
+}
+
+/// A `413 Payload Too Large` response for a request body past the configured cap.
+fn payload_too_large() -> pulsate_core::Response {
+    let mut r = pulsate_core::Response::new(http::StatusCode::PAYLOAD_TOO_LARGE);
+    r.headers_mut().insert(
+        http::header::CONTENT_TYPE,
+        http::HeaderValue::from_static("text/plain; charset=utf-8"),
+    );
+    r.with_body("request body too large")
 }
 
 /// Convert an internal [`pulsate_core::Response`] into an HTTP/3 response head plus

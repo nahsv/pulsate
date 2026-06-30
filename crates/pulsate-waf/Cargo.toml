@@ -9,6 +9,7 @@ description = "WAF signatures, rate limiting, IP allow/deny (CIDR), and a tamper
 
 [dependencies]
 pulsate-core.workspace = true
+ring.workspace = true
 
 [lints]
 workspace = true

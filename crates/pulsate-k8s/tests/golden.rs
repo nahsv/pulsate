@@ -338,6 +338,118 @@ fn rule_without_backends_is_skipped() {
 }
 
 #[test]
+fn malicious_route_fields_are_rejected_not_injected() {
+    // Each of these HTTPRoutes carries a field that, if interpolated verbatim,
+    // would inject Flow directives or an SSRF target. The controller must skip
+    // the offending route entirely rather than emit unsafe config (security C1).
+    let classes = vec![class("pulsate", CONTROLLER_NAME)];
+    let gateways = vec![gateway(
+        "default",
+        "web",
+        "pulsate",
+        vec![listener("http", Some("good.example.com"), 80, "HTTP")],
+    )];
+
+    // 1) Newline-injection + a forged `site` block in the hostname.
+    let newline_host = route(
+        "default",
+        "evil1",
+        vec![parent("web")],
+        vec!["evil.com\n}\nsite injected.com {\n  tls off"],
+        vec![HTTPRouteRule {
+            matches: vec![prefix_match("/")],
+            backend_refs: vec![backend("svc", 80)],
+        }],
+    );
+
+    // 2) `tls off` downgrade smuggled through a hostname with spaces.
+    let tls_off_host = route(
+        "default",
+        "evil2",
+        vec![parent("web")],
+        vec!["host tls off"],
+        vec![HTTPRouteRule {
+            matches: vec![prefix_match("/")],
+            backend_refs: vec![backend("svc", 80)],
+        }],
+    );
+
+    // 3) SSRF: a backend pointing at the cloud metadata endpoint via metachars.
+    let ssrf_backend = route(
+        "default",
+        "evil3",
+        vec![parent("web")],
+        vec!["good.example.com"],
+        vec![HTTPRouteRule {
+            matches: vec![prefix_match("/")],
+            backend_refs: vec![backend("169.254.169.254) tls off proxy(http://evil", 80)],
+        }],
+    );
+
+    // 4) Flow metacharacters in a path-match value.
+    let bad_path = route(
+        "default",
+        "evil4",
+        vec![parent("web")],
+        vec!["good.example.com"],
+        vec![HTTPRouteRule {
+            matches: vec![prefix_match("/x ~> proxy(http://evil)")],
+            backend_refs: vec![backend("svc", 80)],
+        }],
+    );
+
+    // 5) Non-alphabetic method.
+    let bad_method = route(
+        "default",
+        "evil5",
+        vec![parent("web")],
+        vec!["good.example.com"],
+        vec![HTTPRouteRule {
+            matches: vec![HTTPRouteMatch {
+                path: Some(HTTPPathMatch {
+                    match_type: "Exact".to_string(),
+                    value: "/x".to_string(),
+                }),
+                method: Some("GET]\n  route /* ~> respond(status=200) [".to_string()),
+            }],
+            backend_refs: vec![backend("svc", 80)],
+        }],
+    );
+
+    for evil in [
+        newline_host,
+        tls_off_host,
+        ssrf_backend,
+        bad_path,
+        bad_method,
+    ] {
+        let routes = vec![evil];
+        let text = to_flow(&classes, &gateways, &routes, CONTROLLER_NAME);
+        // The only site that may appear is the legitimate listener host, and no
+        // injected directive/target survives.
+        assert!(
+            !text.contains("injected.com"),
+            "site injection leaked:\n{text}"
+        );
+        assert!(
+            !text.contains("169.254.169.254"),
+            "SSRF target leaked:\n{text}"
+        );
+        assert!(
+            !text.contains("proxy(http://evil"),
+            "metachar payload leaked:\n{text}"
+        );
+        assert!(
+            !text.contains("\n  tls off") || text.contains("good.example.com"),
+            "downgrade leaked:\n{text}"
+        );
+        // It must still compile into a valid (empty-of-evil) config.
+        let store = ConfigStore::load("seed", "").unwrap();
+        install(&store, &classes, &gateways, &routes, CONTROLLER_NAME).expect("safe install");
+    }
+}
+
+#[test]
 fn translation_is_deterministic() {
     let classes = vec![class("pulsate", CONTROLLER_NAME)];
     let gateways = vec![gateway(

@@ -161,6 +161,7 @@ codes! {
     CFG_MULTI_HANDLER   = ("CFG", 12, "Multiple handlers in one route", Config, None);
     CFG_ACME_UNREACHABLE = ("CFG", 15, "ACME challenge unreachable", Config, None);
     CFG_DUPLICATE       = ("CFG", 20, "Duplicate definition", Config, None);
+    CFG_INVALID_CORS    = ("CFG", 21, "Invalid CORS configuration", Config, None);
 
     // HTTP / proxy (PLS-HTTP / PLS-PRX).
     HTTP_MALFORMED      = ("HTTP", 1, "Malformed request", Client, Some(400));

@@ -180,7 +180,7 @@ fn audit(api: &AdminApi) -> Response<Full<Bytes>> {
             object(&[
                 num_field("seq", e.seq),
                 field("event", &e.event),
-                field("hash", &format!("{:016x}", e.hash)),
+                field("hash", &e.hash),
             ])
         })
         .collect();

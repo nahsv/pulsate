@@ -72,7 +72,9 @@ pub async fn dispatch(
             };
             if let Some(short) = pulsate_pipeline::ingress(&route.middleware, &mut view) {
                 short // security/CORS short-circuit; never cached
-            } else if let Some(hit) = cache_lookup(route, &method, &host, &path, &parts.headers) {
+            } else if let Some(hit) =
+                cache_lookup(route, &method, &host, &full_target, &parts.headers)
+            {
                 hit
             } else {
                 let eff_path = view.path;
@@ -98,7 +100,14 @@ pub async fn dispatch(
                     other => pulsate_http::handlers::execute(other, &eff_path).await,
                 };
                 pulsate_pipeline::egress(&route.middleware, origin.as_deref(), &mut resp);
-                cache_store(route, &method, &host, &path, &parts.headers, &mut resp);
+                cache_store(
+                    route,
+                    &method,
+                    &host,
+                    &full_target,
+                    &parts.headers,
+                    &mut resp,
+                );
                 resp
             }
         }
@@ -187,14 +196,14 @@ fn cache_lookup(
     route: &Route,
     method: &http::Method,
     host: &str,
-    path: &str,
+    target: &str,
     req_headers: &http::HeaderMap,
 ) -> Option<Response> {
     let cache = route.cache.as_ref()?;
     if !cache.request_allows_cache(method.as_str(), req_headers) {
         return None;
     }
-    let key = cache.key(method.as_str(), host, path, req_headers);
+    let key = cache.key(method.as_str(), host, target, req_headers);
     let hit = cache.lookup(&key)?;
 
     let mut resp = Response::new(hit.status);
@@ -222,7 +231,7 @@ fn cache_store(
     route: &Route,
     method: &http::Method,
     host: &str,
-    path: &str,
+    target: &str,
     req_headers: &http::HeaderMap,
     resp: &mut Response,
 ) {
@@ -237,7 +246,7 @@ fn cache_store(
         Body::Bytes(b) => b.clone(),
         _ => Bytes::new(),
     };
-    let key = cache.key(method.as_str(), host, path, req_headers);
+    let key = cache.key(method.as_str(), host, target, req_headers);
     let stored = cache.maybe_store(&key, resp.status(), resp.headers(), &body);
     set_header(resp, "x-cache", if stored { "MISS" } else { "BYPASS" });
 }

@@ -9,6 +9,7 @@ description = "Secrets backends: environment and file (Vault / cloud KMS to foll
 
 [dependencies]
 pulsate-core.workspace = true
+zeroize.workspace = true
 
 [lints]
 workspace = true

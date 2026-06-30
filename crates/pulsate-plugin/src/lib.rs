@@ -10,10 +10,16 @@
 #![forbid(unsafe_code)]
 
 use pulsate_core::Code;
-use wasmtime::{Caller, Config, Engine, Linker, Module, Store};
+use wasmtime::{Caller, Config, Engine, Linker, Module, Store, StoreLimits, StoreLimitsBuilder};
 
 /// The host ABI version a plugin must target.
 pub const ABI_VERSION: i32 = 1;
+
+/// Maximum linear memory a plugin store may allocate (16 MiB). A `memory.grow`
+/// past this is denied, so a plugin cannot exhaust host memory (H6).
+const MAX_MEMORY_BYTES: usize = 16 << 20;
+/// Maximum table elements a plugin store may allocate (H6).
+const MAX_TABLE_ELEMENTS: usize = 10_000;
 
 /// Capabilities a plugin may be granted. Anything not granted is denied: the
 /// corresponding host import is simply not defined, so a plugin that needs it
@@ -64,6 +70,8 @@ pub struct RunResult {
 /// Per-instance host state the sandboxed plugin can touch through host imports.
 struct HostState {
     logs: Vec<i32>,
+    /// Memory/table/instance caps enforced by the store limiter (H6).
+    limits: StoreLimits,
 }
 
 /// The plugin host: owns the Wasmtime engine (configured for fuel metering).
@@ -125,7 +133,23 @@ impl PluginHost {
         fuel: u64,
         input: i32,
     ) -> Result<RunResult, PluginError> {
-        let mut store = Store::new(&self.engine, HostState { logs: Vec::new() });
+        // Conservative resource caps so a plugin cannot exhaust host memory or
+        // tables even within its fuel budget (H6).
+        let limits = StoreLimitsBuilder::new()
+            .memory_size(MAX_MEMORY_BYTES)
+            .table_elements(MAX_TABLE_ELEMENTS)
+            .instances(1)
+            .tables(1)
+            .memories(1)
+            .build();
+        let mut store = Store::new(
+            &self.engine,
+            HostState {
+                logs: Vec::new(),
+                limits,
+            },
+        );
+        store.limiter(|state| &mut state.limits);
         store
             .set_fuel(fuel)
             .map_err(|e| PluginError::new(Code::PLG_LOAD, format!("set_fuel failed: {e}")))?;
@@ -307,6 +331,30 @@ mod tests {
             .run(&plugin, Capabilities::default(), 10_000, 1)
             .unwrap_err();
         assert_eq!(err.code, Code::PLG_FUEL);
+    }
+
+    // Tries to grow linear memory far past the 16 MiB store limit. `memory.grow`
+    // returns -1 when the limiter denies the request.
+    const OVERSIZED_MEMORY: &str = r#"
+        (module
+          (memory 1)
+          (func (export "pulsate_abi_version") (result i32) (i32.const 1))
+          (func (export "eval") (param i32) (result i32)
+            (memory.grow (i32.const 1000))))
+    "#;
+
+    #[test]
+    fn oversized_memory_grow_is_denied() {
+        let host = PluginHost::new().unwrap();
+        let plugin = host.load("greedy", OVERSIZED_MEMORY.as_bytes()).unwrap();
+        let r = host
+            .run(&plugin, Capabilities::default(), 100_000, 0)
+            .unwrap();
+        // 1000 pages (~64 MiB) exceeds the 16 MiB cap → grow fails, returns -1.
+        assert_eq!(
+            r.output, -1,
+            "store limiter must deny oversized memory.grow"
+        );
     }
 
     #[test]

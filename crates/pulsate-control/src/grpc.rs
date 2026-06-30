@@ -244,7 +244,7 @@ impl Admin for AdminService {
             .map(|e| AuditEntry {
                 seq: e.seq,
                 event: e.event,
-                hash: format!("{:016x}", e.hash),
+                hash: e.hash,
             })
             .collect();
         Ok(Response::new(ProtoAuditLog {
@@ -286,7 +286,7 @@ async fn event_pump(api: Arc<AdminApi>, mut lifecycle: watch::Receiver<Lifecycle
                         api.publish(AdminEvent::AuditAppended {
                             seq: entry.seq,
                             event: entry.event.clone(),
-                            hash: format!("{:016x}", entry.hash),
+                            hash: entry.hash.clone(),
                         });
                         last_seq = Some(entry.seq);
                     }

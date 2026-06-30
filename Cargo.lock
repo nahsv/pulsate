@@ -388,6 +388,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2459377285ad874054d797f3ccebf984978aa39129f6eafde5cdc8315b612f8"
 
 [[package]]
+name = "constant_time_eq"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c74b8349d32d297c9134b8c88677813a227df8f779daa29bfc29c183fe3dca6"
+
+[[package]]
 name = "core-foundation"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2040,6 +2046,7 @@ dependencies = [
  "pulsate-router",
  "pulsate-tls",
  "pulsate-waf",
+ "ring",
  "tokio",
 ]
 
@@ -2072,6 +2079,7 @@ name = "pulsate-control"
 version = "0.2.2"
 dependencies = [
  "bytes",
+ "constant_time_eq",
  "http",
  "http-body-util",
  "hyper",
@@ -2085,6 +2093,7 @@ dependencies = [
  "pulsate-proxy",
  "pulsate-router",
  "pulsate-waf",
+ "ring",
  "tokio",
  "tokio-stream",
  "tonic",
@@ -2249,6 +2258,7 @@ name = "pulsate-secrets"
 version = "0.2.2"
 dependencies = [
  "pulsate-core",
+ "zeroize",
 ]
 
 [[package]]
@@ -2281,6 +2291,7 @@ name = "pulsate-waf"
 version = "0.2.2"
 dependencies = [
  "pulsate-core",
+ "ring",
 ]
 
 [[package]]

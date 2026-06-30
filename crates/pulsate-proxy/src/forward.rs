@@ -6,6 +6,7 @@
 //! a connect error or a retryable status try the next target within the retry
 //! budget, recording failures so the breaker can eject a bad target.
 
+use std::collections::HashSet;
 use std::net::IpAddr;
 
 use bytes::Bytes;
@@ -142,8 +143,12 @@ fn build_request(
     let mut builder = hyper::Request::builder().method(method.clone()).uri(uri);
 
     let headers = builder.headers_mut()?;
+    // Strip the static hop-by-hop set *plus* every header named by the inbound
+    // `Connection` value (RFC 9110 §7.6.1), so a client cannot smuggle an
+    // internal header through to the upstream (M12).
+    let strip = connection_strip_set(req_headers);
     for (name, value) in req_headers {
-        if !HOP_BY_HOP.contains(&name.as_str()) {
+        if !strip.contains(name.as_str()) {
             headers.insert(name, value.clone());
         }
     }
@@ -190,13 +195,33 @@ async fn normalize_response(resp: hyper::Response<hyper::body::Incoming>) -> Res
         .map(http_body_util::Collected::to_bytes)
         .unwrap_or_default();
 
+    let strip = connection_strip_set(&headers);
     let mut out = Response::new(status);
     for (name, value) in &headers {
-        if !HOP_BY_HOP.contains(&name.as_str()) {
+        if !strip.contains(name.as_str()) {
             out.headers_mut().insert(name, value.clone());
         }
     }
     out.with_body(body)
+}
+
+/// The set of header names to strip for one hop: the static hop-by-hop list plus
+/// every token named in the message's own `Connection` header (RFC 9110
+/// §7.6.1). Names are lowercase to match `HeaderName::as_str`.
+fn connection_strip_set(headers: &HeaderMap) -> HashSet<String> {
+    let mut set: HashSet<String> = HOP_BY_HOP.iter().map(|s| (*s).to_string()).collect();
+    if let Some(conn) = headers
+        .get(http::header::CONNECTION)
+        .and_then(|v| v.to_str().ok())
+    {
+        for token in conn.split(',') {
+            let token = token.trim().to_ascii_lowercase();
+            if !token.is_empty() {
+                set.insert(token);
+            }
+        }
+    }
+    set
 }
 
 /// Build a synthetic error response for a proxy failure code.
@@ -218,6 +243,40 @@ mod tests {
     fn error_response_maps_code_to_status() {
         let r = error_response(Code::PRX_NO_HEALTHY);
         assert_eq!(r.status().as_u16(), Code::PRX_NO_HEALTHY.http_status());
+    }
+
+    #[test]
+    fn connection_named_headers_are_stripped() {
+        // A client lists `X-Internal-Auth` in `Connection`; it must not be
+        // forwarded to the upstream (M12).
+        let mut req = HeaderMap::new();
+        req.insert(
+            "connection",
+            HeaderValue::from_static("X-Internal-Auth, close"),
+        );
+        req.insert("x-internal-auth", HeaderValue::from_static("secret"));
+        req.insert("x-keep", HeaderValue::from_static("ok"));
+
+        let request = build_request(
+            &Method::GET,
+            "http://up",
+            "/",
+            &req,
+            Bytes::new(),
+            None,
+            "h",
+        )
+        .expect("request builds");
+        let out = request.headers();
+        assert!(
+            out.get("x-internal-auth").is_none(),
+            "smuggled header stripped"
+        );
+        assert!(
+            out.get("connection").is_none(),
+            "connection header itself stripped"
+        );
+        assert_eq!(out.get("x-keep").unwrap(), "ok");
     }
 
     #[test]

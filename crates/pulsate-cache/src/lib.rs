@@ -26,6 +26,12 @@ pub struct CacheConfig {
     pub stale_while_revalidate: Duration,
     /// Maximum number of stored entries (coarse memory bound).
     pub max_entries: usize,
+    /// Largest single response body that may be cached, in bytes. Bodies above
+    /// this are never stored (M13).
+    pub max_body_bytes: usize,
+    /// Total byte budget across all stored bodies. Inserts that would exceed it
+    /// evict the oldest entries first (size-aware LRU; M13).
+    pub max_total_bytes: usize,
 }
 
 impl Default for CacheConfig {
@@ -36,6 +42,9 @@ impl Default for CacheConfig {
             vary: Vec::new(),
             stale_while_revalidate: Duration::ZERO,
             max_entries: 10_000,
+            // 1 MiB per body, 256 MiB total: bounded memory regardless of count.
+            max_body_bytes: 1 << 20,
+            max_total_bytes: 256 << 20,
         }
     }
 }
@@ -75,11 +84,30 @@ struct Entry {
     tags: Vec<String>,
 }
 
+/// The store's inner state: the entry map plus a running total of cached body
+/// bytes, both guarded by one mutex so they never drift.
+#[derive(Debug, Default)]
+struct Inner {
+    map: HashMap<String, Entry>,
+    /// Sum of `body.len()` across every entry in `map`.
+    bytes: usize,
+}
+
+impl Inner {
+    /// Remove one entry and decrement the byte total to match.
+    fn remove(&mut self, key: &str) -> Option<Entry> {
+        let entry = self.map.remove(key)?;
+        self.bytes = self.bytes.saturating_sub(entry.body.len());
+        Some(entry)
+    }
+}
+
 /// An in-memory cache store, shared behind an `Arc`. Reads and writes take one
-/// mutex; eviction is a flat count cap, with no LRU or size accounting.
+/// mutex; eviction enforces both a count cap and a total-byte budget with
+/// size-aware (oldest-first) eviction.
 #[derive(Debug, Default)]
 pub struct MemoryStore {
-    entries: Mutex<HashMap<String, Entry>>,
+    inner: Mutex<Inner>,
 }
 
 impl MemoryStore {
@@ -92,7 +120,7 @@ impl MemoryStore {
     /// Number of stored entries.
     #[must_use]
     pub fn len(&self) -> usize {
-        self.entries.lock().map_or(0, |m| m.len())
+        self.inner.lock().map_or(0, |i| i.map.len())
     }
 
     /// Whether the store is empty.
@@ -101,20 +129,35 @@ impl MemoryStore {
         self.len() == 0
     }
 
+    /// Total bytes currently held across all cached bodies.
+    #[must_use]
+    pub fn bytes(&self) -> usize {
+        self.inner.lock().map_or(0, |i| i.bytes)
+    }
+
     /// Purge every entry carrying `tag`. Returns the number removed.
     pub fn purge_tag(&self, tag: &str) -> usize {
-        let Ok(mut map) = self.entries.lock() else {
+        let Ok(mut inner) = self.inner.lock() else {
             return 0;
         };
-        let before = map.len();
-        map.retain(|_, e| !e.tags.iter().any(|t| t == tag));
-        before - map.len()
+        let before = inner.map.len();
+        let mut freed = 0;
+        inner.map.retain(|_, e| {
+            let keep = !e.tags.iter().any(|t| t == tag);
+            if !keep {
+                freed += e.body.len();
+            }
+            keep
+        });
+        inner.bytes = inner.bytes.saturating_sub(freed);
+        before - inner.map.len()
     }
 
     /// Remove all entries.
     pub fn clear(&self) {
-        if let Ok(mut map) = self.entries.lock() {
-            map.clear();
+        if let Ok(mut inner) = self.inner.lock() {
+            inner.map.clear();
+            inner.bytes = 0;
         }
     }
 }
@@ -140,9 +183,12 @@ impl CacheLayer {
     }
 
     /// Compute the cache key for a request.
+    ///
+    /// `target` is the full request target (path **and** raw query string), so
+    /// `/p?a` and `/p?b` never collide into one entry (cache poisoning, H4).
     #[must_use]
-    pub fn key(&self, method: &str, host: &str, path: &str, req_headers: &HeaderMap) -> String {
-        let mut key = format!("{method}\n{host}\n{path}");
+    pub fn key(&self, method: &str, host: &str, target: &str, req_headers: &HeaderMap) -> String {
+        let mut key = format!("{method}\n{host}\n{target}");
         for name in &self.config.vary {
             let v = req_headers
                 .get(name.as_str())
@@ -174,10 +220,10 @@ impl CacheLayer {
     /// Fully-expired entries are evicted and reported as a miss.
     #[must_use]
     pub fn lookup(&self, key: &str) -> Option<Hit> {
-        let mut map = self.store.entries.lock().ok()?;
-        let age = map.get(key)?.stored_at.elapsed();
+        let mut inner = self.store.inner.lock().ok()?;
+        let age = inner.map.get(key)?.stored_at.elapsed();
         let (ttl, swr) = {
-            let e = map.get(key)?;
+            let e = inner.map.get(key)?;
             (e.ttl, e.swr)
         };
         let freshness = if age <= ttl {
@@ -185,10 +231,10 @@ impl CacheLayer {
         } else if age <= ttl + swr {
             Freshness::Stale
         } else {
-            map.remove(key);
+            inner.remove(key);
             return None;
         };
-        let entry = map.get(key)?;
+        let entry = inner.map.get(key)?;
         Some(Hit {
             status: entry.status,
             headers: entry.headers.clone(),
@@ -209,6 +255,10 @@ impl CacheLayer {
         let Some(ttl) = self.cacheable_ttl(status, resp_headers) else {
             return false;
         };
+        // Refuse oversized bodies outright (M13).
+        if body.len() > self.config.max_body_bytes {
+            return false;
+        }
         let headers: Vec<(String, String)> = resp_headers
             .iter()
             .filter_map(|(n, v)| {
@@ -219,13 +269,21 @@ impl CacheLayer {
             .collect();
         let tags = parse_tags(resp_headers);
 
-        let Ok(mut map) = self.store.entries.lock() else {
+        let Ok(mut inner) = self.store.inner.lock() else {
             return false;
         };
-        if map.len() >= self.config.max_entries && !map.contains_key(key) {
+        // Replacing an existing key frees its old bytes first.
+        inner.remove(key);
+        if inner.map.len() >= self.config.max_entries {
             return false; // at capacity; refuse new keys
         }
-        map.insert(
+        // Evict oldest entries until this body fits the total-byte budget (M13).
+        evict_until_fits(&mut inner, body.len(), self.config.max_total_bytes);
+        if inner.bytes + body.len() > self.config.max_total_bytes {
+            return false; // single body larger than the whole budget
+        }
+        inner.bytes += body.len();
+        inner.map.insert(
             key.to_string(),
             Entry {
                 status,
@@ -249,6 +307,29 @@ impl CacheLayer {
         if headers.contains_key(http::header::SET_COOKIE) {
             return None;
         }
+        // Respect the response `Vary` header. We only key on the configured
+        // `vary` dimensions, so a response that varies on anything else (e.g.
+        // `Authorization`) cannot be safely reused across requests (H5).
+        if let Some(vary) = headers
+            .get(http::header::VARY)
+            .and_then(|v| v.to_str().ok())
+        {
+            for field in vary.split(',') {
+                let field = field.trim();
+                if field.is_empty() {
+                    continue;
+                }
+                if field == "*"
+                    || !self
+                        .config
+                        .vary
+                        .iter()
+                        .any(|v| v.eq_ignore_ascii_case(field))
+                {
+                    return None;
+                }
+            }
+        }
         let cc = cache_control(headers);
         if cc.contains_key("no-store") || cc.contains_key("private") {
             return None;
@@ -263,6 +344,24 @@ impl CacheLayer {
             }
         }
         Some(self.config.default_ttl)
+    }
+}
+
+/// Evict the oldest entries until `incoming` more bytes fit within `budget`
+/// (size-aware LRU by store time). Stops if the map empties (M13).
+fn evict_until_fits(inner: &mut Inner, incoming: usize, budget: usize) {
+    while inner.bytes + incoming > budget {
+        let Some(oldest) = inner
+            .map
+            .iter()
+            .min_by_key(|(_, e)| e.stored_at)
+            .map(|(k, _)| k.clone())
+        else {
+            break;
+        };
+        if inner.remove(&oldest).is_none() {
+            break;
+        }
     }
 }
 
@@ -403,5 +502,101 @@ mod tests {
         let l = layer();
         let ttl = l.cacheable_ttl(StatusCode::OK, &headers(&[("cache-control", "max-age=5")]));
         assert_eq!(ttl, Some(Duration::from_secs(5)));
+    }
+
+    #[test]
+    fn distinct_query_strings_do_not_collide() {
+        // Two requests differing only in the query string must key separately,
+        // otherwise the first response poisons the second (H4).
+        let l = layer();
+        let k1 = l.key("GET", "h", "/p?attacker", &HeaderMap::new());
+        let k2 = l.key("GET", "h", "/p?victim", &HeaderMap::new());
+        assert_ne!(k1, k2);
+        l.maybe_store(
+            &k1,
+            StatusCode::OK,
+            &HeaderMap::new(),
+            &Bytes::from_static(b"a"),
+        );
+        // The other query is still a miss.
+        assert!(l.lookup(&k2).is_none());
+        assert_eq!(l.lookup(&k1).unwrap().body, Bytes::from_static(b"a"));
+    }
+
+    #[test]
+    fn response_vary_on_unkeyed_header_is_not_cached() {
+        // The cache keys nothing extra, so a response that varies on
+        // `Authorization` must not be stored (H5).
+        let l = layer();
+        let key = l.key("GET", "h", "/p", &HeaderMap::new());
+        assert!(!l.maybe_store(
+            &key,
+            StatusCode::OK,
+            &headers(&[("vary", "Authorization")]),
+            &Bytes::from_static(b"secret")
+        ));
+        assert!(!l.maybe_store(
+            &key,
+            StatusCode::OK,
+            &headers(&[("vary", "*")]),
+            &Bytes::from_static(b"x")
+        ));
+        // A `Vary` naming only a configured dimension is fine.
+        let cfg = CacheConfig {
+            vary: vec!["accept-encoding".into()],
+            ..CacheConfig::default()
+        };
+        let l2 = CacheLayer::new(Arc::new(MemoryStore::new()), cfg);
+        let k = l2.key("GET", "h", "/p", &HeaderMap::new());
+        assert!(l2.maybe_store(
+            &k,
+            StatusCode::OK,
+            &headers(&[("vary", "Accept-Encoding")]),
+            &Bytes::from_static(b"ok")
+        ));
+    }
+
+    #[test]
+    fn oversized_body_is_refused() {
+        let cfg = CacheConfig {
+            max_body_bytes: 8,
+            ..CacheConfig::default()
+        };
+        let l = CacheLayer::new(Arc::new(MemoryStore::new()), cfg);
+        let key = l.key("GET", "h", "/p", &HeaderMap::new());
+        assert!(!l.maybe_store(
+            &key,
+            StatusCode::OK,
+            &HeaderMap::new(),
+            &Bytes::from_static(b"too-large-body")
+        ));
+        assert!(l.store().is_empty());
+    }
+
+    #[test]
+    fn total_byte_budget_evicts_oldest() {
+        let cfg = CacheConfig {
+            max_body_bytes: 100,
+            max_total_bytes: 10,
+            ..CacheConfig::default()
+        };
+        let l = CacheLayer::new(Arc::new(MemoryStore::new()), cfg);
+        let k1 = l.key("GET", "h", "/a", &HeaderMap::new());
+        let k2 = l.key("GET", "h", "/b", &HeaderMap::new());
+        assert!(l.maybe_store(
+            &k1,
+            StatusCode::OK,
+            &HeaderMap::new(),
+            &Bytes::from_static(b"aaaaaa")
+        )); // 6 bytes
+        assert!(l.maybe_store(
+            &k2,
+            StatusCode::OK,
+            &HeaderMap::new(),
+            &Bytes::from_static(b"bbbbbb")
+        )); // 6 bytes → 12 > 10, evict /a
+        assert!(l.lookup(&k1).is_none(), "oldest evicted");
+        assert!(l.lookup(&k2).is_some());
+        assert!(l.store().bytes() <= 10);
     }
 }

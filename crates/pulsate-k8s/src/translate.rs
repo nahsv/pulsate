@@ -66,6 +66,19 @@ pub fn to_flow(
         let route_ns = route.metadata.namespace.clone().unwrap_or_default();
         let route_name = route.metadata.name.clone().unwrap_or_default();
 
+        // Reject the whole route if any field that reaches the generated Flow
+        // text is not strictly safe. Emitting unsafe Flow would let a tenant
+        // inject directives (`tls off`, extra `site`/`route` blocks) or SSRF
+        // targets that are recompiled and published cluster-wide (security C1).
+        if !route_is_valid(route) {
+            tracing::warn!(
+                namespace = %route_ns,
+                name = %route_name,
+                "skipping HTTPRoute: a field failed strict Flow-safety validation"
+            );
+            continue;
+        }
+
         // The managed gateways this route attaches to via its parentRefs.
         let parents: Vec<&Gateway> = route
             .spec
@@ -128,6 +141,13 @@ type RouteKey = (u8, usize, String, String, String);
 fn hosts_for(gw: &Gateway, route_hostnames: &[String]) -> Vec<(String, bool)> {
     let mut out = Vec::new();
     for listener in &gw.spec.listeners {
+        // Listener hostnames are also untrusted CRD strings that land in `site`
+        // headers; drop any listener whose hostname is not DNS-valid (C1).
+        if let Some(lh) = listener.hostname.as_deref() {
+            if !is_valid_hostname(lh) {
+                continue;
+            }
+        }
         let is_https = listener.protocol.eq_ignore_ascii_case("HTTPS");
         match (listener.hostname.as_deref(), route_hostnames.is_empty()) {
             // Listener pins a hostname, route is unconstrained: use the listener's.
@@ -237,6 +257,93 @@ fn prefix_to_glob(value: &str) -> String {
     } else {
         format!("{trimmed}/*")
     }
+}
+
+/// Whether every CRD string field on `route` that reaches the generated Flow
+/// text is strictly safe to interpolate. Any failure means the whole route is
+/// skipped (security C1) rather than emitting unsafe config.
+fn route_is_valid(route: &HTTPRoute) -> bool {
+    for host in &route.spec.hostnames {
+        if !is_valid_hostname(host) {
+            return false;
+        }
+    }
+    for rule in &route.spec.rules {
+        for m in &rule.matches {
+            if let Some(path) = &m.path {
+                if !is_valid_path_value(&path.value) {
+                    return false;
+                }
+            }
+            if let Some(method) = &m.method {
+                if !is_valid_method(method) {
+                    return false;
+                }
+            }
+        }
+        for backend in &rule.backend_refs {
+            if !is_dns_label(&backend.name) {
+                return false;
+            }
+            if let Some(ns) = &backend.namespace {
+                if !is_dns_label(ns) {
+                    return false;
+                }
+            }
+        }
+    }
+    true
+}
+
+/// A hostname is valid when it is a sequence of RFC 1123 DNS labels (optionally
+/// prefixed with a single `*.` wildcard, as Gateway API listener hostnames may
+/// be). This forbids whitespace, newlines, and every Flow metacharacter as a
+/// side effect of the strict label alphabet.
+fn is_valid_hostname(host: &str) -> bool {
+    let host = host.strip_prefix("*.").unwrap_or(host);
+    if host.is_empty() || host.len() > 253 {
+        return false;
+    }
+    host.split('.').all(is_dns_label)
+}
+
+/// A single RFC 1123 DNS label: 1–63 lowercase-alphanumeric chars plus `-`, not
+/// leading or trailing with `-`. Used for hostnames, Service names, namespaces.
+fn is_dns_label(label: &str) -> bool {
+    let bytes = label.as_bytes();
+    if bytes.is_empty() || bytes.len() > 63 {
+        return false;
+    }
+    if !bytes[0].is_ascii_alphanumeric() || !bytes[bytes.len() - 1].is_ascii_alphanumeric() {
+        return false;
+    }
+    label
+        .bytes()
+        .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'-')
+}
+
+/// An HTTP method is valid when it is one or more ASCII letters (`^[A-Za-z]+$`);
+/// it is upper-cased before emission so the Flow predicate sees `^[A-Z]+$`.
+fn is_valid_method(method: &str) -> bool {
+    !method.is_empty() && method.bytes().all(|b| b.is_ascii_alphabetic())
+}
+
+/// A path-match value is valid when it is an absolute path with no whitespace,
+/// control characters, or Flow metacharacters that could break out of the
+/// matcher token.
+fn is_valid_path_value(value: &str) -> bool {
+    value.starts_with('/') && !has_unsafe_char(value)
+}
+
+/// Whether `s` contains a character that is unsafe to interpolate into Flow
+/// source: whitespace, control characters, or a Flow metacharacter
+/// (`{` `}` `(` `)` `"` `~` `>` `<` `#` `@`). `~>` is covered by rejecting `~`.
+fn has_unsafe_char(s: &str) -> bool {
+    s.chars().any(|c| {
+        c.is_whitespace()
+            || c.is_control()
+            || matches!(c, '{' | '}' | '(' | ')' | '"' | '~' | '>' | '<' | '#' | '@')
+    })
 }
 
 /// A deterministic, lexically valid upstream identifier for a rule.

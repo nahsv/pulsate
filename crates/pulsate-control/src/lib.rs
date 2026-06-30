@@ -145,8 +145,20 @@ impl AdminApi {
     }
 
     /// Resolve the scopes for a bearer token, if known.
+    ///
+    /// Compares the presented token against every registered token in
+    /// constant time over their SHA-256 digests, so neither a match/no-match
+    /// decision nor token length leaks through response timing (LOW).
     fn scopes_for(&self, token: &str) -> Option<Scopes> {
-        self.tokens.get(token).copied()
+        let presented = ring::digest::digest(&ring::digest::SHA256, token.as_bytes());
+        let mut found = None;
+        for (known, scopes) in &self.tokens {
+            let known_digest = ring::digest::digest(&ring::digest::SHA256, known.as_bytes());
+            if constant_time_eq::constant_time_eq(presented.as_ref(), known_digest.as_ref()) {
+                found = Some(*scopes);
+            }
+        }
+        found
     }
 
     /// Subscribe to the admin event bus. Each subscriber receives every event

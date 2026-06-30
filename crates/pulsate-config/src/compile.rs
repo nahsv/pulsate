@@ -580,6 +580,32 @@ fn validate(config: &Config, diags: &mut Vec<Diagnostic>) {
         }
     }
 
+    // `cors(origins=["*"], credentials=true)` is forbidden by the Fetch spec and
+    // is a credential-leak footgun; reject it at compile time (LOW).
+    for site in &config.sites {
+        for route in &site.routes {
+            for mw in &route.mw_specs {
+                if let MwSpec::Cors {
+                    origins,
+                    credentials,
+                    ..
+                } = mw
+                {
+                    if *credentials && origins.iter().any(|o| o == "*") {
+                        diags.push(
+                            Diagnostic::error(
+                                Code::CFG_INVALID_CORS,
+                                "cors(credentials=true) cannot be combined with a `*` origin",
+                                route.span,
+                            )
+                            .with_help("list explicit origins, or set credentials=false"),
+                        );
+                    }
+                }
+            }
+        }
+    }
+
     check_host_collisions(config, diags);
 }
 
@@ -815,5 +841,18 @@ mod tests {
     fn unsupported_flow_version_is_rejected() {
         let errs = errors("flow_version \"2\"\nsite s.com { route /* ~> respond(status=200) }");
         assert!(errs.iter().any(|d| d.code() == Code::CFG_TYPE_MISMATCH));
+    }
+
+    #[test]
+    fn cors_wildcard_with_credentials_is_rejected() {
+        let src = "site s.com { route /* ~> cors(origins=[\"*\"], credentials=true) ~> respond(status=200) }";
+        let errs = errors(src);
+        assert!(errs.iter().any(|d| d.code() == Code::CFG_INVALID_CORS));
+    }
+
+    #[test]
+    fn cors_explicit_origin_with_credentials_is_allowed() {
+        let src = "site s.com { route /* ~> cors(origins=[\"https://app.example.com\"], credentials=true) ~> respond(status=200) }";
+        assert!(compile("t.flow", src, 0).is_ok());
     }
 }

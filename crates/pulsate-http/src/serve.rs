@@ -13,7 +13,7 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use bytes::Bytes;
-use http_body_util::{BodyExt, Full};
+use http_body_util::{BodyExt, Full, Limited};
 use hyper::body::Incoming;
 use hyper::service::service_fn;
 use hyper::{Request, Response as HyperResponse};
@@ -57,6 +57,7 @@ where
 
 /// Route and execute one request, returning a fully-buffered response, and
 /// record metrics + an access-log line at the end ([Finalize]).
+#[allow(clippy::too_many_lines)] // linear request lifecycle wiring
 async fn handle(
     req: Request<Incoming>,
     peer: SocketAddr,
@@ -66,6 +67,8 @@ async fn handle(
     let rid = request_id();
 
     let (parts, body) = req.into_parts();
+    // Cap the inbound body so one large/slow POST cannot exhaust memory (H3).
+    let body = Limited::new(body, gateway.max_request_body_bytes);
     let host = request_host(&parts);
     let path = parts.uri.path().to_string();
     let query = parts.uri.query().map(ToString::to_string);
@@ -96,7 +99,9 @@ async fn handle(
             };
             if let Some(short) = pulsate_pipeline::ingress(&route.middleware, &mut view) {
                 short // security/CORS short-circuit; never cached
-            } else if let Some(hit) = cache_lookup(route, &method, &host, &path, &parts.headers) {
+            } else if let Some(hit) =
+                cache_lookup(route, &method, &host, &full_target, &parts.headers)
+            {
                 hit
             } else {
                 let eff_path = view.path;
@@ -106,28 +111,36 @@ async fn handle(
                 };
                 let mut resp = match &route.handler {
                     Handler::Proxy { upstream, target } => {
-                        let body_bytes = body
-                            .collect()
-                            .await
-                            .map(http_body_util::Collected::to_bytes)
-                            .unwrap_or_default();
-                        proxy(
-                            gateway,
-                            upstream.as_deref(),
-                            target.as_deref(),
-                            &method,
-                            &eff_pq,
-                            &parts.headers,
-                            body_bytes,
-                            peer,
-                            &host,
-                        )
-                        .await
+                        match body.collect().await {
+                            // `Limited` errors once the cap is exceeded → 413.
+                            Err(_) => payload_too_large(),
+                            Ok(collected) => {
+                                proxy(
+                                    gateway,
+                                    upstream.as_deref(),
+                                    target.as_deref(),
+                                    &method,
+                                    &eff_pq,
+                                    &parts.headers,
+                                    collected.to_bytes(),
+                                    peer,
+                                    &host,
+                                )
+                                .await
+                            }
+                        }
                     }
                     other => handlers::execute(other, &eff_path).await,
                 };
                 pulsate_pipeline::egress(&route.middleware, origin.as_deref(), &mut resp);
-                cache_store(route, &method, &host, &path, &parts.headers, &mut resp);
+                cache_store(
+                    route,
+                    &method,
+                    &host,
+                    &full_target,
+                    &parts.headers,
+                    &mut resp,
+                );
                 resp
             }
         }
@@ -216,14 +229,14 @@ fn cache_lookup(
     route: &Route,
     method: &http::Method,
     host: &str,
-    path: &str,
+    target: &str,
     req_headers: &http::HeaderMap,
 ) -> Option<Response> {
     let cache = route.cache.as_ref()?;
     if !cache.request_allows_cache(method.as_str(), req_headers) {
         return None;
     }
-    let key = cache.key(method.as_str(), host, path, req_headers);
+    let key = cache.key(method.as_str(), host, target, req_headers);
     let hit = cache.lookup(&key)?;
 
     let mut resp = Response::new(hit.status);
@@ -251,7 +264,7 @@ fn cache_store(
     route: &Route,
     method: &http::Method,
     host: &str,
-    path: &str,
+    target: &str,
     req_headers: &http::HeaderMap,
     resp: &mut Response,
 ) {
@@ -266,7 +279,7 @@ fn cache_store(
         Body::Bytes(b) => b.clone(),
         _ => Bytes::new(),
     };
-    let key = cache.key(method.as_str(), host, path, req_headers);
+    let key = cache.key(method.as_str(), host, target, req_headers);
     let stored = cache.maybe_store(&key, resp.status(), resp.headers(), &body);
     set_header(resp, "x-cache", if stored { "MISS" } else { "BYPASS" });
 }
@@ -308,6 +321,16 @@ fn not_found() -> Response {
         http::HeaderValue::from_static("text/plain; charset=utf-8"),
     );
     r.with_body("no route matched")
+}
+
+/// A `413 Payload Too Large` response for a request body past the configured cap.
+fn payload_too_large() -> Response {
+    let mut r = Response::new(http::StatusCode::PAYLOAD_TOO_LARGE);
+    r.headers_mut().insert(
+        http::header::CONTENT_TYPE,
+        http::HeaderValue::from_static("text/plain; charset=utf-8"),
+    );
+    r.with_body("request body too large")
 }
 
 /// Extract the request host from the `Host` header or the URI authority.

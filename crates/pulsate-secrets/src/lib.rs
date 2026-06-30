@@ -13,6 +13,7 @@
 use std::path::PathBuf;
 
 use pulsate_core::{BoxFuture, Code, PulsateError, Result};
+use zeroize::Zeroizing;
 
 /// A backend that resolves a secret reference to its value.
 pub trait SecretsBackend: Send + Sync {
@@ -75,14 +76,16 @@ impl SecretsBackend for FileBackend {
             ));
         }
         let path = self.dir.join(reference);
-        std::fs::read_to_string(&path)
-            .map(|s| s.trim_end_matches(['\n', '\r']).to_string())
-            .map_err(|e| {
-                PulsateError::new(
-                    Code::SYS_GENERIC,
-                    format!("secret `{reference}` unreadable: {e}"),
-                )
-            })
+        // Hold the full file contents in a buffer that is zeroized on drop so the
+        // plaintext (often larger than the trimmed secret) does not linger in
+        // freed heap memory (LOW).
+        let raw = Zeroizing::new(std::fs::read_to_string(&path).map_err(|e| {
+            PulsateError::new(
+                Code::SYS_GENERIC,
+                format!("secret `{reference}` unreadable: {e}"),
+            )
+        })?);
+        Ok(raw.trim_end_matches(['\n', '\r']).to_string())
     }
 }
 

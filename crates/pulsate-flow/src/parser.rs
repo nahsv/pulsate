@@ -148,8 +148,14 @@ impl Parser {
             && matches!(self.next_kind(), TokenKind::Equals)
         {
             let name_tok = self.bump();
+            // The peek above guarantees an `Atom`, but degrade to a syntax error
+            // rather than panicking if that invariant is ever violated (LOW).
             let TokenKind::Atom(name) = name_tok.kind.clone() else {
-                unreachable!("checked Atom above");
+                return Err(Diagnostic::error(
+                    Code::CFG_SYNTAX,
+                    "expected an argument name",
+                    name_tok.span,
+                ));
             };
             self.bump(); // =
             let value = self.parse_value()?;

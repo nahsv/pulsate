@@ -112,11 +112,34 @@ pub async fn up(opts: UpOptions) -> u8 {
 
     // Admin API + embedded dashboard (loopback by default).
     if let Some(addr) = opts.admin {
+        let generated = opts.admin_token.is_none();
         let token = opts.admin_token.clone().unwrap_or_else(generate_token);
         match pulsate_net::bind(addr) {
             Ok(listener) => {
                 println!("pulsate: admin + dashboard on http://{addr}/");
-                println!("pulsate: admin token: {token}");
+                // Never print the bearer token to stdout — it would land verbatim
+                // in journald/Docker/k8s logs (M11). For a generated token, persist
+                // it to a 0600 file and log the path; otherwise log only a short
+                // fingerprint so the operator can correlate without leaking it.
+                if generated {
+                    match write_token_file(&token) {
+                        Ok(path) => println!(
+                            "pulsate: generated admin token written to {} (fingerprint {})",
+                            path.display(),
+                            token_fingerprint(&token)
+                        ),
+                        Err(e) => eprintln!(
+                            "pulsate: could not persist generated admin token ({e}); \
+                             fingerprint {}",
+                            token_fingerprint(&token)
+                        ),
+                    }
+                } else {
+                    println!(
+                        "pulsate: admin token fingerprint {}",
+                        token_fingerprint(&token)
+                    );
+                }
                 let api = Arc::new(AdminApi::new(
                     Arc::clone(&store),
                     Arc::clone(&gateway),
@@ -262,18 +285,58 @@ async fn serve_metrics(
     }
 }
 
-/// Generate a 128-bit hex admin token from the process id and wall-clock time.
-/// Adequate for a loopback default; operators should set `--admin-token` in
-/// production (`docs/09-security.md`).
+/// Generate a 256-bit admin token from the operating-system CSPRNG, hex-encoded.
+/// Unguessable even on a loopback default; operators may still set `--admin-token`
+/// explicitly (`docs/09-security.md`).
 fn generate_token() -> String {
-    use std::time::{SystemTime, UNIX_EPOCH};
-    let nanos = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_or(0, |d| d.as_nanos());
-    let pid = u128::from(std::process::id());
-    let mut hash = 0xcbf2_9ce4_8422_2325_u128 ^ nanos ^ (pid << 64);
-    hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
-    format!("{hash:032x}")
+    use ring::rand::{SecureRandom, SystemRandom};
+    let rng = SystemRandom::new();
+    let mut bytes = [0u8; 32];
+    rng.fill(&mut bytes)
+        .expect("operating-system CSPRNG must be available at startup");
+    hex(&bytes)
+}
+
+/// A short, non-reversible fingerprint of a token: the first 8 hex chars of its
+/// SHA-256 digest. Safe to log; the token itself never appears (M11).
+fn token_fingerprint(token: &str) -> String {
+    let digest = ring::digest::digest(&ring::digest::SHA256, token.as_bytes());
+    hex(&digest.as_ref()[..4])
+}
+
+/// Persist a generated token to `./pulsate-admin-token` with `0600` permissions
+/// (best effort on non-Unix), returning the path written.
+fn write_token_file(token: &str) -> std::io::Result<PathBuf> {
+    use std::io::Write as _;
+    let path = std::env::current_dir()?.join("pulsate-admin-token");
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::{OpenOptionsExt as _, PermissionsExt as _};
+        let mut file = std::fs::OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .mode(0o600)
+            .open(&path)?;
+        // Re-assert mode in case the file pre-existed with looser permissions.
+        file.set_permissions(std::fs::Permissions::from_mode(0o600))?;
+        file.write_all(token.as_bytes())?;
+    }
+    #[cfg(not(unix))]
+    {
+        std::fs::write(&path, token.as_bytes())?;
+    }
+    Ok(path)
+}
+
+/// Lower-case hex-encode bytes.
+fn hex(bytes: &[u8]) -> String {
+    use std::fmt::Write as _;
+    let mut out = String::with_capacity(bytes.len() * 2);
+    for b in bytes {
+        let _ = write!(out, "{b:02x}");
+    }
+    out
 }
 
 fn spawn_signal_listener(tx: watch::Sender<Lifecycle>) {

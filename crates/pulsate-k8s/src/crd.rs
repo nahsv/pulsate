@@ -69,7 +69,13 @@ pub struct Listener {
     /// A unique (within the `Gateway`) listener name.
     pub name: String,
     /// The hostname this listener serves (may be a wildcard like `*.example.com`).
+    ///
+    /// Constrained to RFC 1123 DNS form so the API server rejects whitespace and
+    /// Flow metacharacters before the controller ever renders it (security C1).
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[schemars(regex(
+        pattern = r"^(\*\.)?([a-z0-9]([-a-z0-9]*[a-z0-9])?\.)*[a-z0-9]([-a-z0-9]*[a-z0-9])?$"
+    ))]
     pub hostname: Option<String>,
     /// The listening port.
     pub port: u16,
@@ -151,8 +157,10 @@ pub struct HTTPRouteMatch {
     /// The path match (prefix/exact).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub path: Option<HTTPPathMatch>,
-    /// An optional HTTP-method refinement (`GET`, `POST`, …).
+    /// An optional HTTP-method refinement (`GET`, `POST`, …). Restricted to
+    /// ASCII letters so it cannot smuggle Flow syntax (security C1).
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[schemars(regex(pattern = r"^[A-Za-z]+$"))]
     pub method: Option<String>,
 }
 
@@ -163,7 +171,9 @@ pub struct HTTPPathMatch {
     /// `PathPrefix` or `Exact` (other types are treated as `PathPrefix`).
     #[serde(rename = "type")]
     pub match_type: String,
-    /// The path value (e.g. `/api`).
+    /// The path value (e.g. `/api`). Must be an absolute path free of whitespace
+    /// and Flow metacharacters (security C1).
+    #[schemars(regex(pattern = r#"^/[^\s{}()"~><#@]*$"#))]
     pub value: String,
 }
 
@@ -180,10 +190,12 @@ impl Default for HTTPPathMatch {
 #[derive(Clone, Debug, Default, Deserialize, Serialize, JsonSchema, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct HTTPBackendRef {
-    /// The backend `Service` name.
+    /// The backend `Service` name (an RFC 1123 DNS label; security C1).
+    #[schemars(regex(pattern = r"^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"))]
     pub name: String,
-    /// The backend namespace (defaults to the route's namespace).
+    /// The backend namespace (defaults to the route's namespace; RFC 1123 label).
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[schemars(regex(pattern = r"^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"))]
     pub namespace: Option<String>,
     /// The backend service port.
     #[serde(default, skip_serializing_if = "Option::is_none")]
