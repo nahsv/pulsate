@@ -34,7 +34,7 @@ members = [
 # Single source of truth for shared package metadata. Member crates inherit via
 # `version.workspace = true` etc. so versions never drift (docs/03-repository.md).
 [workspace.package]
-version = "0.2.2"
+version = "0.3.0"
 edition = "2021"
 rust-version = "1.86"
 license = "Apache-2.0"
@@ -43,33 +43,33 @@ repository = "https://github.com/squaretick/pulsate"
 # Shared dependency versions, declared once and inherited with `dep.workspace = true`.
 [workspace.dependencies]
 # Internal crates (path deps) — versions inherited via `dep.workspace = true`.
-pulsate-acme = { path = "crates/pulsate-acme", version = "0.2.2" }
-pulsate-cache = { path = "crates/pulsate-cache", version = "0.2.2" }
-pulsate-cli = { path = "crates/pulsate-cli", version = "0.2.2" }
-pulsate-cluster = { path = "crates/pulsate-cluster", version = "0.2.2" }
-pulsate-config = { path = "crates/pulsate-config", version = "0.2.2" }
-pulsate-control = { path = "crates/pulsate-control", version = "0.2.2" }
-pulsate-core = { path = "crates/pulsate-core", version = "0.2.2" }
-pulsate-dashboard = { path = "crates/pulsate-dashboard", version = "0.2.2" }
-pulsate-flow = { path = "crates/pulsate-flow", version = "0.2.2" }
-pulsate-http = { path = "crates/pulsate-http", version = "0.2.2" }
-pulsate-http3 = { path = "crates/pulsate-http3", version = "0.2.2" }
-pulsate-k8s = { path = "crates/pulsate-k8s", version = "0.2.2" }
-pulsate-migrate = { path = "crates/pulsate-migrate", version = "0.2.2" }
-pulsate-net = { path = "crates/pulsate-net", version = "0.2.2" }
-pulsate-observe = { path = "crates/pulsate-observe", version = "0.2.2" }
-pulsate-pipeline = { path = "crates/pulsate-pipeline", version = "0.2.2" }
-pulsate-plugin = { path = "crates/pulsate-plugin", version = "0.2.2" }
-pulsate-proxy = { path = "crates/pulsate-proxy", version = "0.2.2" }
-pulsate-router = { path = "crates/pulsate-router", version = "0.2.2" }
-pulsate-rt = { path = "crates/pulsate-rt", version = "0.2.2" }
-pulsate-sdk = { path = "crates/pulsate-sdk", version = "0.2.2" }
-pulsate-secrets = { path = "crates/pulsate-secrets", version = "0.2.2" }
-pulsate-test = { path = "crates/pulsate-test", version = "0.2.2" }
-pulsate-tls = { path = "crates/pulsate-tls", version = "0.2.2" }
-pulsate-util = { path = "crates/pulsate-util", version = "0.2.2" }
-pulsate-waf = { path = "crates/pulsate-waf", version = "0.2.2" }
-pulsate = { path = "crates/pulsate", version = "0.2.2" }
+pulsate-acme = { path = "crates/pulsate-acme", version = "0.3.0" }
+pulsate-cache = { path = "crates/pulsate-cache", version = "0.3.0" }
+pulsate-cli = { path = "crates/pulsate-cli", version = "0.3.0" }
+pulsate-cluster = { path = "crates/pulsate-cluster", version = "0.3.0" }
+pulsate-config = { path = "crates/pulsate-config", version = "0.3.0" }
+pulsate-control = { path = "crates/pulsate-control", version = "0.3.0" }
+pulsate-core = { path = "crates/pulsate-core", version = "0.3.0" }
+pulsate-dashboard = { path = "crates/pulsate-dashboard", version = "0.3.0" }
+pulsate-flow = { path = "crates/pulsate-flow", version = "0.3.0" }
+pulsate-http = { path = "crates/pulsate-http", version = "0.3.0" }
+pulsate-http3 = { path = "crates/pulsate-http3", version = "0.3.0" }
+pulsate-k8s = { path = "crates/pulsate-k8s", version = "0.3.0" }
+pulsate-migrate = { path = "crates/pulsate-migrate", version = "0.3.0" }
+pulsate-net = { path = "crates/pulsate-net", version = "0.3.0" }
+pulsate-observe = { path = "crates/pulsate-observe", version = "0.3.0" }
+pulsate-pipeline = { path = "crates/pulsate-pipeline", version = "0.3.0" }
+pulsate-plugin = { path = "crates/pulsate-plugin", version = "0.3.0" }
+pulsate-proxy = { path = "crates/pulsate-proxy", version = "0.3.0" }
+pulsate-router = { path = "crates/pulsate-router", version = "0.3.0" }
+pulsate-rt = { path = "crates/pulsate-rt", version = "0.3.0" }
+pulsate-sdk = { path = "crates/pulsate-sdk", version = "0.3.0" }
+pulsate-secrets = { path = "crates/pulsate-secrets", version = "0.3.0" }
+pulsate-test = { path = "crates/pulsate-test", version = "0.3.0" }
+pulsate-tls = { path = "crates/pulsate-tls", version = "0.3.0" }
+pulsate-util = { path = "crates/pulsate-util", version = "0.3.0" }
+pulsate-waf = { path = "crates/pulsate-waf", version = "0.3.0" }
+pulsate = { path = "crates/pulsate", version = "0.3.0" }
 # External, third-party deps used across the workspace are pinned here.
 tokio = { version = "1", default-features = false }
 bytes = "1"
