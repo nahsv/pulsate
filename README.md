@@ -18,12 +18,33 @@ scales, unchanged in shape, to a multi-site deployment.
 
 ## Install
 
-Every channel installs the **`pulsate`** binary.
+### Install (prebuilt, no compile)
+
+The fastest path — downloads a verified prebuilt binary, no Rust toolchain
+required. Works on Linux and macOS (x86_64 and arm64):
 
 ```sh
-# Shell installer (Linux/macOS) — downloads the prebuilt release binary
 curl --proto '=https' --tlsv1.2 -fsSL https://raw.githubusercontent.com/squaretick/pulsate/main/scripts/install.sh | sh
+```
 
+The installer detects your OS/arch, downloads the matching release archive,
+verifies its SHA256 checksum, and installs `pulsate` into `~/.local/bin`
+(override with `INSTALL_DIR=…`). Pin a version with `PULSATE_VERSION=v0.1.0`.
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://raw.githubusercontent.com/squaretick/pulsate/main/scripts/install.ps1 | iex
+```
+
+Or download the `pulsate-<version>-x86_64-pc-windows-msvc.zip` asset from the
+[latest release](https://github.com/squaretick/pulsate/releases/latest), unzip
+it, and put `pulsate.exe` on your `PATH`. (The shell installer above also works
+from Git Bash / MSYS2.)
+
+### Other channels
+
+```sh
 # Cargo (any platform with Rust)
 cargo install pulsate
 cargo binstall pulsate           # prebuilt binary, no compile

@@ -2,6 +2,7 @@
 //! dispatch to the command implementations in `pulsate-cli` (`docs/13-cli.md`).
 #![forbid(unsafe_code)]
 
+use std::io::IsTerminal;
 use std::net::SocketAddr;
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -230,6 +231,11 @@ fn emit(outcome: &pulsate_cli::Outcome) -> ExitCode {
 
 /// Print version and a short list of common commands.
 fn print_info() {
+    // Show the branded banner only for an interactive terminal; when stdout is
+    // piped/redirected the info text stays plain so it remains scriptable.
+    if std::io::stdout().is_terminal() {
+        pulsate_cli::ui::banner();
+    }
     let bin = "pulsate";
     let version = env!("CARGO_PKG_VERSION");
     println!("{bin} {version} — one binary, one config, one command");

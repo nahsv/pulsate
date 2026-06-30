@@ -53,11 +53,16 @@ pub struct TlsOptions {
 /// Run the gateway. Returns a process exit code.
 #[allow(clippy::too_many_lines)] // top-level wiring of listeners + admin
 pub async fn up(opts: UpOptions) -> u8 {
+    crate::ui::banner();
+
     let name = opts.config.display().to_string();
+
+    // Config compile is fast, but a spinner gives startup a branded heartbeat.
+    let sp = crate::ui::spinner(&format!("compiling configuration ({name})"));
     let text = match std::fs::read_to_string(&opts.config) {
         Ok(t) => t,
         Err(e) => {
-            eprintln!("pulsate: cannot read {name}: {e}");
+            crate::ui::finish_err(sp, &format!("cannot read {name}: {e}"));
             return crate::exit::RUNTIME;
         }
     };
@@ -65,14 +70,19 @@ pub async fn up(opts: UpOptions) -> u8 {
     let store = match ConfigStore::load(&name, &text) {
         Ok(s) => Arc::new(s),
         Err(diags) => {
+            crate::ui::finish_err(
+                sp,
+                &format!("{name} is invalid — {} problem(s)", diags.len()),
+            );
+            // Diagnostics stay verbatim on stderr so spans/colors render as authored.
             let source = Source::new(&name, &text);
             for d in &diags {
                 eprint!("{}", d.render(&source));
             }
-            eprintln!("error: {name} is invalid — {} problem(s)", diags.len());
             return crate::exit::CONFIG_INVALID;
         }
     };
+    crate::ui::finish_ok(sp, "configuration compiled");
 
     let gateway = {
         let config = &store.current().config;
@@ -87,6 +97,11 @@ pub async fn up(opts: UpOptions) -> u8 {
             .with_alt_svc(alt_svc),
         )
     };
+    crate::ui::step(&format!(
+        "routing table built — {} site(s), {} upstream(s)",
+        gateway.router.site_count(),
+        gateway.upstreams.len()
+    ));
     let audit = Arc::new(AuditLog::new());
     audit.append("gateway started");
     let listener_cfg = ListenerConfig::default();
@@ -101,12 +116,12 @@ pub async fn up(opts: UpOptions) -> u8 {
     if let Some(addr) = opts.metrics {
         match pulsate_net::bind(addr) {
             Ok(listener) => {
-                println!("pulsate: metrics on http://{addr}/metrics");
+                crate::ui::step(&format!("metrics on http://{addr}/metrics"));
                 let telemetry = Arc::clone(&gateway.telemetry);
                 let rx = lifecycle_rx.clone();
                 tasks.push(tokio::spawn(serve_metrics(listener, telemetry, rx)));
             }
-            Err(e) => eprintln!("pulsate: cannot bind metrics {addr}: {e}"),
+            Err(e) => crate::ui::error(&format!("cannot bind metrics {addr}: {e}")),
         }
     }
 
@@ -116,29 +131,29 @@ pub async fn up(opts: UpOptions) -> u8 {
         let token = opts.admin_token.clone().unwrap_or_else(generate_token);
         match pulsate_net::bind(addr) {
             Ok(listener) => {
-                println!("pulsate: admin + dashboard on http://{addr}/");
-                // Never print the bearer token to stdout — it would land verbatim
-                // in journald/Docker/k8s logs (M11). For a generated token, persist
+                crate::ui::step(&format!("admin + dashboard on http://{addr}/"));
+                // Never print the bearer token — it would land verbatim in
+                // journald/Docker/k8s logs (M11). For a generated token, persist
                 // it to a 0600 file and log the path; otherwise log only a short
                 // fingerprint so the operator can correlate without leaking it.
                 if generated {
                     match write_token_file(&token) {
-                        Ok(path) => println!(
-                            "pulsate: generated admin token written to {} (fingerprint {})",
+                        Ok(path) => crate::ui::step(&format!(
+                            "generated admin token written to {} (fingerprint {})",
                             path.display(),
                             token_fingerprint(&token)
-                        ),
-                        Err(e) => eprintln!(
-                            "pulsate: could not persist generated admin token ({e}); \
+                        )),
+                        Err(e) => crate::ui::error(&format!(
+                            "could not persist generated admin token ({e}); \
                              fingerprint {}",
                             token_fingerprint(&token)
-                        ),
+                        )),
                     }
                 } else {
-                    println!(
-                        "pulsate: admin token fingerprint {}",
+                    crate::ui::step(&format!(
+                        "admin token fingerprint {}",
                         token_fingerprint(&token)
-                    );
+                    ));
                 }
                 let api = Arc::new(AdminApi::new(
                     Arc::clone(&store),
@@ -151,18 +166,22 @@ pub async fn up(opts: UpOptions) -> u8 {
                     listener, api, rx,
                 )));
             }
-            Err(e) => eprintln!("pulsate: cannot bind admin {addr}: {e}"),
+            Err(e) => crate::ui::error(&format!("cannot bind admin {addr}: {e}")),
         }
     }
 
     // Plain-HTTP listener.
+    let sp = crate::ui::spinner(&format!("binding listener on {}", opts.listen));
     match pulsate_net::bind(opts.listen) {
         Ok(listener) => {
-            println!(
-                "pulsate: listening on http://{} ({} sites, {} upstreams)",
-                opts.listen,
-                gateway.router.site_count(),
-                gateway.upstreams.len()
+            crate::ui::finish_ok(
+                sp,
+                &format!(
+                    "listening on http://{} ({} site(s), {} upstream(s))",
+                    opts.listen,
+                    gateway.router.site_count(),
+                    gateway.upstreams.len()
+                ),
             );
             let gateway = Arc::clone(&gateway);
             let rx = lifecycle_rx.clone();
@@ -177,13 +196,14 @@ pub async fn up(opts: UpOptions) -> u8 {
             }));
         }
         Err(e) => {
-            eprintln!("pulsate: cannot bind {}: {e}", opts.listen);
+            crate::ui::finish_err(sp, &format!("cannot bind {}: {e}", opts.listen));
             return crate::exit::RUNTIME;
         }
     }
 
     // Optional TLS listener.
     if let Some(tls) = &opts.tls {
+        let sp = crate::ui::spinner(&format!("binding TLS listener on {}", tls.listen));
         match build_tls_listener(
             tls,
             Arc::clone(&gateway),
@@ -191,17 +211,22 @@ pub async fn up(opts: UpOptions) -> u8 {
             listener_cfg,
         ) {
             Ok(task) => {
-                println!("pulsate: listening on https://{}", tls.listen);
+                crate::ui::finish_ok(sp, &format!("listening on https://{}", tls.listen));
                 tasks.push(task);
             }
-            Err(code) => return code,
+            Err(code) => {
+                crate::ui::finish_err(sp, "TLS listener setup failed");
+                return code;
+            }
         }
     }
 
+    // From here on the gateway is serving; no spinner is running, so the JSON
+    // access-log stream on stdout stays clean.
     for task in tasks {
         let _ = task.await;
     }
-    println!("pulsate: shutdown complete");
+    crate::ui::step("shutdown complete");
     crate::exit::OK
 }
 
@@ -212,27 +237,27 @@ fn build_tls_listener(
     cfg: ListenerConfig,
 ) -> Result<tokio::task::JoinHandle<()>, u8> {
     let cert_pem = std::fs::read(&tls.cert).map_err(|e| {
-        eprintln!("pulsate: cannot read cert {}: {e}", tls.cert.display());
+        crate::ui::error(&format!("cannot read cert {}: {e}", tls.cert.display()));
         crate::exit::RUNTIME
     })?;
     let key_pem = std::fs::read(&tls.key).map_err(|e| {
-        eprintln!("pulsate: cannot read key {}: {e}", tls.key.display());
+        crate::ui::error(&format!("cannot read key {}: {e}", tls.key.display()));
         crate::exit::RUNTIME
     })?;
     let ck = pulsate_tls::certified_key_from_pem(&cert_pem, &key_pem).map_err(|e| {
-        eprintln!("pulsate: {e}");
+        crate::ui::error(&e.to_string());
         crate::exit::RUNTIME
     })?;
     let mut resolver = pulsate_tls::CertResolver::new();
     resolver.set_default(ck);
     let config = pulsate_tls::server_config(resolver).map_err(|e| {
-        eprintln!("pulsate: {e}");
+        crate::ui::error(&e.to_string());
         crate::exit::RUNTIME
     })?;
     let acceptor = pulsate_tls::acceptor(config);
 
     let listener = pulsate_net::bind(tls.listen).map_err(|e| {
-        eprintln!("pulsate: cannot bind {}: {e}", tls.listen);
+        crate::ui::error(&format!("cannot bind {}: {e}", tls.listen));
         crate::exit::RUNTIME
     })?;
 
@@ -360,7 +385,7 @@ fn spawn_signal_listener(tx: watch::Sender<Lifecycle>) {
         {
             let _ = tokio::signal::ctrl_c().await;
         }
-        eprintln!("pulsate: draining (grace {:?})", Duration::from_secs(30));
+        crate::ui::step(&format!("draining (grace {:?})", Duration::from_secs(30)));
         let _ = tx.send(Lifecycle::Draining);
     });
 }

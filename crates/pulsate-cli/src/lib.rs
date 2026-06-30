@@ -9,6 +9,7 @@ use std::path::Path;
 
 use pulsate_config::{compile, ConfigStore, Source};
 
+pub mod ui;
 pub mod up;
 #[doc(inline)]
 pub use up::{up, TlsOptions, UpOptions};

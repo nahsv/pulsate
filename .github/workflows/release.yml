@@ -9,30 +9,9 @@ permissions:
   packages: write
 
 jobs:
-  # Cross-platform binaries (pulsate), archived and attached to the release.
-  binaries:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest }
-          - { target: aarch64-unknown-linux-gnu, os: ubuntu-24.04-arm }
-          - { target: x86_64-apple-darwin, os: macos-13 }
-          - { target: aarch64-apple-darwin, os: macos-14 }
-          - { target: x86_64-pc-windows-msvc, os: windows-latest }
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.target }}
-      - uses: taiki-e/upload-rust-binary-action@v1
-        with:
-          bin: pulsate
-          target: ${{ matrix.target }}
-          archive: pulsate-$tag-$target
-          checksum: sha256
-          token: ${{ secrets.GITHUB_TOKEN }}
+  # NOTE: cross-platform binary archives (pulsate, p8) + SHA256 checksums are
+  # produced by .github/workflows/release-binaries.yml, which also runs on the
+  # `v*` tag. This workflow handles OS packages and the container image only.
 
   # Debian/Ubuntu .deb and RHEL/Fedora .rpm, attached to the release.
   packages:

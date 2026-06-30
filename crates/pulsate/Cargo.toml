@@ -16,8 +16,15 @@ categories = [
     "command-line-utilities",
 ]
 
-# A shared `run()` lives in src/lib.rs. The binary `pulsate` (src/main.rs) is a
-# thin wrapper, discovered automatically.
+# A shared `run()` lives in src/lib.rs. Both binaries are thin wrappers: the
+# full name `pulsate` and the short alias `p8` (identical behavior).
+[[bin]]
+name = "pulsate"
+path = "src/main.rs"
+
+[[bin]]
+name = "p8"
+path = "src/bin/p8.rs"
 
 [dependencies]
 pulsate-core.workspace = true

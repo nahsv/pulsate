@@ -20,6 +20,8 @@ pulsate-http3.workspace = true
 pulsate-plugin.workspace = true
 pulsate-migrate.workspace = true
 ring.workspace = true
+owo-colors.workspace = true
+indicatif.workspace = true
 tokio = { workspace = true, features = [
     "rt",
     "rt-multi-thread",

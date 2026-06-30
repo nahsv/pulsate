@@ -1,0 +1,54 @@
+name: release-binaries
+
+# Attach prebuilt, cross-platform binaries to the GitHub Release that
+# release-plz creates for each `v*` tag. release-plz (release-plz.yml) pushes
+# the tag and opens the Release; this workflow fires on that tag push and
+# uploads one archive per target plus a `.sha256` checksum that scripts/install.sh
+# verifies. Keep the matrix in sync with scripts/install.sh's target mapping.
+#
+# Binaries shipped: pulsate and p8 (the short alias). Both are bundled into a
+# single archive per target.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  upload-binaries:
+    name: ${{ matrix.target }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: x86_64-unknown-linux-gnu, os: ubuntu-latest }
+          - { target: aarch64-unknown-linux-gnu, os: ubuntu-24.04-arm }
+          - { target: x86_64-unknown-linux-musl, os: ubuntu-latest }
+          - { target: x86_64-apple-darwin, os: macos-13 }
+          - { target: aarch64-apple-darwin, os: macos-14 }
+          - { target: x86_64-pc-windows-msvc, os: windows-latest }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      # musl needs a static C toolchain for crates with C dependencies.
+      - name: Install musl tools
+        if: contains(matrix.target, 'musl')
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      # Cross-compiles, builds in release, tars (unix) / zips (windows),
+      # generates a SHA256 checksum file, and uploads everything to the
+      # Release for the tag that triggered this run.
+      - uses: taiki-e/upload-rust-binary-action@v1
+        with:
+          bin: pulsate,p8
+          target: ${{ matrix.target }}
+          archive: pulsate-$tag-$target
+          checksum: sha256
+          token: ${{ secrets.GITHUB_TOKEN }}

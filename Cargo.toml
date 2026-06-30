@@ -102,6 +102,11 @@ ring = "0.17"
 zeroize = "1"
 # Constant-time byte comparison for token authentication.
 constant_time_eq = "0.3"
+# Branded CLI presentation: zero-alloc truecolor (owo-colors) and a spinner for
+# the fast config-compile / listener-bind phases (indicatif). Both are
+# TTY/NO_COLOR-gated in `pulsate-cli::ui` and write only to stderr.
+owo-colors = "4"
+indicatif = "0.18"
 
 # Workspace-wide lint policy (docs/03-repository.md: coding standards). Members opt
 # in with `[lints] workspace = true`. Kept as `warn` so scaffold builds stay green;
