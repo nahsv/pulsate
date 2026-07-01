@@ -12,6 +12,14 @@ name: release-binaries
 on:
   push:
     tags: ["v*"]
+  # Manual backfill: build/upload binaries for an already-published tag (e.g. a
+  # release whose tag was pushed by GITHUB_TOKEN, which can't trigger this
+  # workflow automatically). Run from main with the tag name, e.g. `v0.3.0`.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to build and upload binaries for (e.g. v0.3.0)"
+        required: true
 
 permissions:
   contents: write
@@ -32,6 +40,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          # On tag push this is empty → defaults to the triggering tag. On
+          # manual dispatch, check out the requested tag.
+          ref: ${{ github.event.inputs.tag || github.ref }}
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -50,5 +62,8 @@ jobs:
           bin: pulsate,p8
           target: ${{ matrix.target }}
           archive: pulsate-$tag-$target
+          # Pin the tag explicitly so `$tag` and the upload target are correct
+          # for both tag-push and manual-dispatch runs.
+          ref: refs/tags/${{ github.event.inputs.tag || github.ref_name }}
           checksum: sha256
           token: ${{ secrets.GITHUB_TOKEN }}

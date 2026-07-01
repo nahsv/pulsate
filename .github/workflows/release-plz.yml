@@ -26,7 +26,9 @@ jobs:
           # has to trigger the tag-driven workflows (release.yml,
           # release-binaries.yml). Events from the default GITHUB_TOKEN do NOT
           # trigger other workflows, which leaves releases with no assets.
-          GITHUB_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN || secrets.GITHUB_TOKEN }}
+          # No GITHUB_TOKEN fallback on purpose: a missing PAT must fail loudly
+          # here rather than silently publish a release with no binaries.
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
           # crates.io index fetches over HTTP/2 intermittently hit
           # `[16] Error in the HTTP2 framing layer`. Force HTTP/1.1 and retry
