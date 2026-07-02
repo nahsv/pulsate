@@ -138,6 +138,9 @@ resolve_version
 base="${PRIMARY_BIN}-${version}-${target}"
 archive="${base}.${ext}"
 url="https://github.com/${REPO}/releases/download/${version}/${archive}"
+# The checksum asset is named "<base>.sha256" (no archive extension) — this is
+# how upload-rust-binary-action names it. Do NOT append ".sha256" to $archive.
+checksum_url="https://github.com/${REPO}/releases/download/${version}/${base}.sha256"
 
 have curl || err "curl is required"
 case "$ext" in
@@ -153,11 +156,11 @@ curl --proto '=https' --tlsv1.2 -fSL "$url" -o "$workdir/$archive" \
   || err "no release asset for ${target} at ${url}"
 
 step "verifying checksum"
-if curl --proto '=https' --tlsv1.2 -fsSL "${url}.sha256" -o "$workdir/$archive.sha256"; then
+if curl --proto '=https' --tlsv1.2 -fsSL "$checksum_url" -o "$workdir/$archive.sha256"; then
   verify_checksum "$workdir/$archive" "$workdir/$archive.sha256"
   ok "checksum verified"
 else
-  err "checksum file missing (${url}.sha256) — refusing to install unverified binary"
+  err "checksum file missing ($checksum_url) — refusing to install unverified binary"
 fi
 
 step "extracting"
