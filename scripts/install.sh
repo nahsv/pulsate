@@ -30,17 +30,20 @@ else
   TEAL=""; BOLD=""; DIM=""; RESET=""
 fi
 
+# $1 = resolved version (e.g. v0.3.0), shown next to the tagline.
 wordmark() {
-  [ -n "$TEAL" ] && printf '%s' "$TEAL"
+  [ -n "$TEAL" ] && printf '%s' "$BOLD$TEAL"
   cat <<'BANNER'
-  ####  #   # #      ####  ###  ##### #####
-  #   # #   # #     #     #   #   #   #
-  ####  #   # #      ###  #####   #   ####
-  #     #   # #         # #   #   #   #
-  #      ###  ##### ####  #   #   #   #####
+  ____        _           _
+ |  _ \ _   _| |___  __ _| |_ ___
+ | |_) | | | | / __|/ _` | __/ _ \
+ |  __/| |_| | \__ \ (_| | ||  __/
+ |_|    \__,_|_|___/\__,_|\__\___|
 BANNER
   [ -n "$RESET" ] && printf '%s' "$RESET"
-  printf '%sA reverse-proxy gateway in one binary.%s\n\n' "$DIM" "$RESET"
+  printf '%s a reverse-proxy gateway in one binary%s' "$DIM" "$RESET"
+  [ -n "${1:-}" ] && printf '  %s%s%s' "$TEAL" "$1" "$RESET"
+  printf '\n\n'
 }
 
 step() { printf '%s▸%s %s\n' "$TEAL" "$RESET" "$1"; }
@@ -131,9 +134,9 @@ install_bin() {
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
-wordmark
 detect_target
 resolve_version
+wordmark "$version"
 
 base="${PRIMARY_BIN}-${version}-${target}"
 archive="${base}.${ext}"
